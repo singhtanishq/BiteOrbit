@@ -24,19 +24,19 @@ These were inspected directly before any project change.
 
 ## Toolchain inventory
 
-| Tool | Version | Status |
-| --- | --- | --- |
-| Node.js | v24.22.1 | available |
-| npm | 11.19.1 | available |
-| pnpm | 12.18.0 | available (workspaces supported) |
-| Go | 1.27.2 darwin/arm64 | available |
-| Docker | 29.9.3 | installed; daemon started via Docker Desktop at M00 |
-| Docker Compose | v5.7.0 | available |
-| Git | 2.54.0 (Apple Git-157) | available |
-| Python | 3.14.7 | available (not required by the stack) |
-| Mailpit | installed via Homebrew | available as a non-Docker fallback for local email capture |
-| Yarn | not installed | not needed |
-| PostgreSQL / Redis (native) | not installed | provided through Docker Compose |
+| Tool                        | Version                | Status                                                     |
+| --------------------------- | ---------------------- | ---------------------------------------------------------- |
+| Node.js                     | v24.22.1               | available                                                  |
+| npm                         | 11.19.1                | available                                                  |
+| pnpm                        | 12.18.0                | available (workspaces supported)                           |
+| Go                          | 1.27.2 darwin/arm64    | available                                                  |
+| Docker                      | 29.9.3                 | installed; daemon started via Docker Desktop at M00        |
+| Docker Compose              | v5.7.0                 | available                                                  |
+| Git                         | 2.54.0 (Apple Git-157) | available                                                  |
+| Python                      | 3.14.7                 | available (not required by the stack)                      |
+| Mailpit                     | installed via Homebrew | available as a non-Docker fallback for local email capture |
+| Yarn                        | not installed          | not needed                                                 |
+| PostgreSQL / Redis (native) | not installed          | provided through Docker Compose                            |
 
 ## Decisions
 

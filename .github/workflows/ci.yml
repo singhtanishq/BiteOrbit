@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  web:
+    name: Web (lint · typecheck · test · build)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test:web
+      - run: pnpm build
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+
+  api:
+    name: API (vet · unit · integration)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: biteorbit
+          POSTGRES_PASSWORD: biteorbit
+          POSTGRES_DB: biteorbit
+        ports:
+          - 54329:5432
+        options: >-
+          --health-cmd "pg_isready -U biteorbit"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 54380:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      BITEORBIT_DATABASE_URL: postgres://biteorbit:biteorbit@127.0.0.1:54329/biteorbit?sslmode=disable
+      BITEORBIT_REDIS_URL: redis://127.0.0.1:54380/0
+      BITEORBIT_ENV: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.27"
+          cache-dependency-path: services/api/go.sum
+      - name: Vet
+        run: cd services/api && go vet ./...
+      - name: Test (unit + integration, real database)
+        run: cd services/api && go test ./... -count=1
+
+  openapi:
+    name: OpenAPI route coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.27"
+          cache-dependency-path: services/api/go.sum
+      - name: Check every served route is documented
+        run: bash scripts/openapi-check.sh

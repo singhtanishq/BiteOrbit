@@ -1,0 +1,50 @@
+{
+  "name": "biteorbit",
+  "private": true,
+  "version": "0.1.0",
+  "description": "BiteOrbit — multi-sided food discovery and delivery platform (local demo)",
+  "packageManager": "pnpm@12.18.0",
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "dev:api": "bash scripts/api-dev.sh",
+    "dev:customer": "pnpm --filter @biteorbit/customer-web dev",
+    "dev:restaurant": "pnpm --filter @biteorbit/restaurant-web dev",
+    "dev:courier": "pnpm --filter @biteorbit/courier-web dev",
+    "dev:admin": "pnpm --filter @biteorbit/admin-web dev",
+    "build": "pnpm -r build",
+    "build:api": "cd services/api && go build -o bin/api ./cmd/api",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "pnpm -r lint",
+    "fmt": "prettier --write \"**/*.{ts,tsx,css,md,json,yml,yaml}\" --log-level warn",
+    "fmt:check": "prettier --check \"**/*.{ts,tsx,css,md,json,yml,yaml}\"",
+    "test": "pnpm test:web && pnpm test:api",
+    "test:web": "pnpm -r test",
+    "test:api": "cd services/api && go test ./...",
+    "check:api": "cd services/api && go vet ./... && go fmt ./... ",
+    "compose:up": "docker compose up -d",
+    "compose:down": "docker compose down",
+    "compose:reset": "docker compose down -v && docker compose up -d",
+    "migrate": "bash scripts/migrate.sh up",
+    "migrate:status": "bash scripts/migrate.sh status",
+    "seed": "bash scripts/seed.sh",
+    "reset": "bash scripts/reset-local.sh",
+    "api:openapi": "bash scripts/openapi-check.sh",
+    "e2e": "pnpm --filter @biteorbit/e2e test"
+  },
+  "devDependencies": {
+    "prettier": "^3.6.2"
+  },
+  "engines": {
+    "node": ">=20",
+    "pnpm": ">=9"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "@tailwindcss/oxide",
+      "sharp",
+      "unrs-resolver",
+      "@parcel/watcher"
+    ]
+  }
+}

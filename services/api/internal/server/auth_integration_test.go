@@ -2,6 +2,7 @@ package server_test
 
 import (
 	"encoding/json"
+	"log/slog"
 	"net/http"
 	"net/http/cookiejar"
 	"net/http/httptest"
@@ -19,6 +20,11 @@ var env *itest.Env
 
 func TestMain(m *testing.M) {
 	env = itest.MainStart()
+	// Deterministic demo dataset for the whole package run.
+	if err := env.MustSeed(); err != nil {
+		slog.Error("test seed failed", slog.Any("err", err))
+		os.Exit(1)
+	}
 	code := m.Run()
 	env.Teardown()
 	os.Exit(code)

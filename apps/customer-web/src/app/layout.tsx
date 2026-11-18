@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import { DemoBanner, Logo } from "@biteorbit/ui";
+import { CartBadge } from "@/components/CartBadge";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -35,12 +36,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Link className="rounded-full px-3 py-1.5 hover:bg-cream-200" href="/account">
                 Account
               </Link>
-              <Link
-                className="ml-2 rounded-full bg-coral-500 px-4 py-1.5 text-white hover:bg-coral-600"
-                href="/cart"
-              >
-                Cart
-              </Link>
+              <CartBadge />
             </nav>
           </div>
         </header>

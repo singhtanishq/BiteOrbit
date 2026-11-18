@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"time"
 
+	"biteorbit/services/api/internal/cart"
 	"biteorbit/services/api/internal/discovery"
 	"biteorbit/services/api/internal/httpx"
 	"biteorbit/services/api/internal/users"
@@ -24,6 +25,32 @@ func registerDomainRoutes(rg *httpx.Registry, deps Deps) {
 	registerAuthRoutes(rg, deps)
 	registerMeRoutes(rg, deps)
 	registerDiscoveryRoutes(rg, deps)
+	registerCartRoutes(rg, deps)
+}
+
+func registerCartRoutes(rg *httpx.Registry, deps Deps) {
+	c := cart.NewHandlers(deps.Pool)
+	auth := deps.Auth.RequireAuth
+
+	rg.Handle(http.MethodGet, "/api/v1/cart", httpx.RouteMeta{
+		Summary: "Caller's active cart with server-side revalidation", Tag: "cart", Auth: "any",
+	}, auth(c.Get))
+
+	rg.Handle(http.MethodPost, "/api/v1/cart/items", httpx.RouteMeta{
+		Summary: "Add a configured item (requires confirmation to replace another outlet's cart)", Tag: "cart", Auth: "any",
+	}, auth(c.AddItem))
+
+	rg.Handle(http.MethodPatch, "/api/v1/cart/items/{id}", httpx.RouteMeta{
+		Summary: "Update quantity or instructions of an owned cart line", Tag: "cart", Auth: "any",
+	}, auth(c.UpdateItem))
+
+	rg.Handle(http.MethodDelete, "/api/v1/cart/items/{id}", httpx.RouteMeta{
+		Summary: "Remove an owned cart line", Tag: "cart", Auth: "any",
+	}, auth(c.DeleteItem))
+
+	rg.Handle(http.MethodDelete, "/api/v1/cart", httpx.RouteMeta{
+		Summary: "Clear the active cart", Tag: "cart", Auth: "any",
+	}, auth(c.Clear))
 }
 
 func registerDiscoveryRoutes(rg *httpx.Registry, deps Deps) {

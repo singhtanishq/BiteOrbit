@@ -1,6 +1,6 @@
 import { apiRequest } from "./http";
 
-export { ApiError, buildUrl, friendlyError } from "./http";
+export { ApiError, apiRequest, buildUrl, friendlyError } from "./http";
 export type { ErrorBody, RequestOptions } from "./http";
 
 export {

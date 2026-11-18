@@ -12,6 +12,7 @@ import {
   MenuItem,
 } from "@biteorbit/api-client";
 import { Badge, Button, EmptyState, Skeleton, Spinner, cx, formatINR } from "@biteorbit/ui";
+import { ItemSheet } from "@/components/ItemSheet";
 
 const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
@@ -25,6 +26,7 @@ export default function RestaurantPage() {
   const [activeCategory, setActiveCategory] = useState("");
   const [query, setQuery] = useState("");
   const [vegOnly, setVegOnly] = useState(false);
+  const [sheetItem, setSheetItem] = useState<MenuItem | null>(null);
 
   useEffect(() => {
     let alive = true;
@@ -223,13 +225,16 @@ export default function RestaurantPage() {
               </h3>
               <ul className="mt-3 divide-y divide-ink-100 overflow-hidden rounded-xl border border-ink-100 bg-white">
                 {c.items.map((it) => (
-                  <MenuRow key={it.id} item={it} />
+                  <MenuRow key={it.id} item={it} onOpen={() => setSheetItem(it)} />
                 ))}
               </ul>
             </div>
           ))
         )}
       </section>
+      {sheetItem ? (
+        <ItemSheet item={sheetItem} onClose={() => setSheetItem(null)} onAdded={() => setSheetItem(null)} />
+      ) : null}
     </main>
   );
 }
@@ -249,9 +254,10 @@ function VegDot({ veg }: { veg: boolean }) {
   );
 }
 
-function MenuRow({ item }: { item: MenuItem }) {
+function MenuRow({ item, onOpen }: { item: MenuItem; onOpen: () => void }) {
   const [expanded, setExpanded] = useState(false);
   const hasMods = item.modifier_groups.length > 0;
+  const canOrder = item.is_available;
 
   return (
     <li className="flex items-start justify-between gap-4 px-4 py-4">
@@ -328,8 +334,13 @@ function MenuRow({ item }: { item: MenuItem }) {
         >
           🍽️
         </span>
-        {/* Add-to-cart arrives with the cart milestone (M05) */}
-        <span className="mt-2 block text-[11px] font-semibold text-ink-400">cart soon</span>
+        <button
+          onClick={onOpen}
+          disabled={!canOrder}
+          className="mt-2 w-16 rounded-md border border-coral-500 py-1 text-xs font-bold text-coral-600 hover:bg-coral-50 disabled:border-ink-200 disabled:text-ink-400"
+        >
+          {canOrder ? "ADD" : "—"}
+        </button>
       </div>
     </li>
   );

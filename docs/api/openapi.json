@@ -158,6 +158,107 @@
         ]
       }
     },
+    "/api/v1/cart": {
+      "delete": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "summary": "Clear the active cart",
+        "tags": [
+          "cart"
+        ]
+      },
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "summary": "Caller's active cart with server-side revalidation",
+        "tags": [
+          "cart"
+        ]
+      }
+    },
+    "/api/v1/cart/items": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "summary": "Add a configured item (requires confirmation to replace another outlet's cart)",
+        "tags": [
+          "cart"
+        ]
+      }
+    },
+    "/api/v1/cart/items/{id}": {
+      "delete": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "summary": "Remove an owned cart line",
+        "tags": [
+          "cart"
+        ]
+      },
+      "patch": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "summary": "Update quantity or instructions of an owned cart line",
+        "tags": [
+          "cart"
+        ]
+      }
+    },
     "/api/v1/discovery/collections": {
       "get": {
         "responses": {

@@ -148,9 +148,14 @@ func (e *Env) Teardown() {
 // SeedDemo loads a reduced synthetic dataset into the test database.
 func (e *Env) SeedDemo(t *testing.T) {
 	t.Helper()
-	if err := seed.Run(context.Background(), e.Pool, slog.Default(), seed.SeedOptions{Orders: 40}); err != nil {
+	if err := e.MustSeed(); err != nil {
 		t.Fatalf("seed test db: %v", err)
 	}
+}
+
+// MustSeed is the testing.T-free variant used from TestMain.
+func (e *Env) MustSeed() error {
+	return seed.Run(context.Background(), e.Pool, slog.Default(), seed.SeedOptions{Orders: 40})
 }
 
 // NewJar creates a cookie jar for use with Do.

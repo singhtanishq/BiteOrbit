@@ -158,6 +158,108 @@
         ]
       }
     },
+    "/api/v1/discovery/collections": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [],
+        "summary": "Curated collections with outlet counts",
+        "tags": [
+          "discovery"
+        ]
+      }
+    },
+    "/api/v1/discovery/cuisines": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [],
+        "summary": "Cuisine filter chips with outlet counts",
+        "tags": [
+          "discovery"
+        ]
+      }
+    },
+    "/api/v1/discovery/dishes": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [],
+        "summary": "Search dishes across all active outlets",
+        "tags": [
+          "discovery"
+        ]
+      }
+    },
+    "/api/v1/discovery/restaurants": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [],
+        "summary": "List/search restaurants with filters, sorting, pagination",
+        "tags": [
+          "discovery"
+        ]
+      }
+    },
+    "/api/v1/discovery/serviceability": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [],
+        "summary": "Check demo-city serviceability for a point or locality",
+        "tags": [
+          "discovery"
+        ]
+      }
+    },
+    "/api/v1/discovery/suggestions": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [],
+        "summary": "Search suggestions across restaurants, cuisines and dishes",
+        "tags": [
+          "discovery"
+        ]
+      }
+    },
     "/api/v1/healthz": {
       "get": {
         "responses": {
@@ -347,6 +449,40 @@
         "summary": "Readiness probe (database connectivity)",
         "tags": [
           "system"
+        ]
+      }
+    },
+    "/api/v1/restaurants/{id}": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [],
+        "summary": "Outlet detail with hours, rating and address",
+        "tags": [
+          "restaurants"
+        ]
+      }
+    },
+    "/api/v1/restaurants/{id}/menu": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [],
+        "summary": "Full menu with categories, items and modifier groups",
+        "tags": [
+          "restaurants"
         ]
       }
     }

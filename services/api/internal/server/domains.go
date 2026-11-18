@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"time"
 
+	"biteorbit/services/api/internal/discovery"
 	"biteorbit/services/api/internal/httpx"
 	"biteorbit/services/api/internal/users"
 )
@@ -22,6 +23,44 @@ import (
 func registerDomainRoutes(rg *httpx.Registry, deps Deps) {
 	registerAuthRoutes(rg, deps)
 	registerMeRoutes(rg, deps)
+	registerDiscoveryRoutes(rg, deps)
+}
+
+func registerDiscoveryRoutes(rg *httpx.Registry, deps Deps) {
+	d := discovery.NewHandlers(deps.Pool)
+	pub := deps.Auth.OptionalAuth
+
+	rg.Handle(http.MethodGet, "/api/v1/discovery/restaurants", httpx.RouteMeta{
+		Summary: "List/search restaurants with filters, sorting, pagination", Tag: "discovery", Auth: "public",
+	}, pub(d.ListRestaurants))
+
+	rg.Handle(http.MethodGet, "/api/v1/discovery/suggestions", httpx.RouteMeta{
+		Summary: "Search suggestions across restaurants, cuisines and dishes", Tag: "discovery", Auth: "public",
+	}, pub(d.Suggestions))
+
+	rg.Handle(http.MethodGet, "/api/v1/discovery/dishes", httpx.RouteMeta{
+		Summary: "Search dishes across all active outlets", Tag: "discovery", Auth: "public",
+	}, pub(d.SearchDishes))
+
+	rg.Handle(http.MethodGet, "/api/v1/discovery/cuisines", httpx.RouteMeta{
+		Summary: "Cuisine filter chips with outlet counts", Tag: "discovery", Auth: "public",
+	}, pub(d.ListCuisines))
+
+	rg.Handle(http.MethodGet, "/api/v1/discovery/collections", httpx.RouteMeta{
+		Summary: "Curated collections with outlet counts", Tag: "discovery", Auth: "public",
+	}, pub(d.ListCollections))
+
+	rg.Handle(http.MethodPost, "/api/v1/discovery/serviceability", httpx.RouteMeta{
+		Summary: "Check demo-city serviceability for a point or locality", Tag: "discovery", Auth: "public",
+	}, pub(d.Serviceability))
+
+	rg.Handle(http.MethodGet, "/api/v1/restaurants/{id}", httpx.RouteMeta{
+		Summary: "Outlet detail with hours, rating and address", Tag: "restaurants", Auth: "public",
+	}, pub(d.GetOutlet))
+
+	rg.Handle(http.MethodGet, "/api/v1/restaurants/{id}/menu", httpx.RouteMeta{
+		Summary: "Full menu with categories, items and modifier groups", Tag: "restaurants", Auth: "public",
+	}, pub(d.GetOutletMenu))
 }
 
 func registerAuthRoutes(rg *httpx.Registry, deps Deps) {

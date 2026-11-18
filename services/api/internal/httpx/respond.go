@@ -5,6 +5,7 @@ package httpx
 import (
 	"encoding/json"
 	"errors"
+	"log/slog"
 	"net/http"
 
 	"biteorbit/services/api/internal/apperr"
@@ -35,6 +36,12 @@ func WriteMeta(w http.ResponseWriter, r *http.Request, data any, meta map[string
 // an opaque 500 without internals (no stack traces leak).
 func WriteError(w http.ResponseWriter, r *http.Request, err error) {
 	body, status := apperr.BodyFrom(err)
+	if status >= http.StatusInternalServerError {
+		slog.ErrorContext(r.Context(), "internal error",
+			slog.String("request_id", RequestIDFrom(r.Context())),
+			slog.String("path", r.URL.Path),
+			slog.Any("err", err))
+	}
 	writeJSON(w, r, status, Envelope{Error: &body, RequestID: RequestIDFrom(r.Context())})
 }
 

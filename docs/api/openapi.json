@@ -1,0 +1,67 @@
+{
+  "info": {
+    "description": "Versioned REST API for the BiteOrbit platform. All responses use the envelope { data, meta?, error? }. Authenticated endpoints use the HttpOnly bo_session cookie via the same-origin proxy. Money values are integer paise (1 INR = 100 paise).",
+    "title": "BiteOrbit API",
+    "version": "1.0.0"
+  },
+  "openapi": "3.0.3",
+  "paths": {
+    "/api/v1/healthz": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [],
+        "summary": "Liveness probe",
+        "tags": [
+          "system"
+        ]
+      }
+    },
+    "/api/v1/openapi.json": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [],
+        "summary": "OpenAPI document (generated from registered routes)",
+        "tags": [
+          "system"
+        ]
+      }
+    },
+    "/api/v1/readyz": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [],
+        "summary": "Readiness probe (database connectivity)",
+        "tags": [
+          "system"
+        ]
+      }
+    }
+  },
+  "servers": [
+    {
+      "description": "same-origin proxy path",
+      "url": "/api/v1"
+    }
+  ]
+}

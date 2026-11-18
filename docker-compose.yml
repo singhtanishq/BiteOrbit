@@ -1,0 +1,45 @@
+# BiteOrbit local development infrastructure.
+# Host ports are deliberately non-standard (54329/54380/51025/51080) to avoid
+# colliding with anything already running on the machine.
+name: biteorbit
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: biteorbit
+      POSTGRES_PASSWORD: biteorbit
+      POSTGRES_DB: biteorbit
+      # Local demo credentials only — never use these in production.
+    ports:
+      - "54329:5432"
+    volumes:
+      - biteorbit-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U biteorbit -d biteorbit"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "no", "--save", ""]
+    ports:
+      - "54380:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+
+  mailpit:
+    image: axllent/mailpit:v1.24
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: "1"
+      MP_SMTP_AUTH_ALLOW_INSECURE: "1"
+    ports:
+      - "51025:1025" # SMTP
+      - "51080:8025" # Web UI
+
+volumes:
+  biteorbit-pgdata:

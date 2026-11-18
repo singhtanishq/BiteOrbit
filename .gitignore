@@ -1,1 +1,53 @@
+# Private master directive — NEVER commit or publish
 BiteOrbit.md
+
+# Secrets and environment
+.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+vendor/
+
+# Build output
+dist/
+build/
+.next/
+out/
+*.tsbuildinfo
+
+# Go binaries and coverage
+services/api/bin/
+bin/
+*.test
+coverage.out
+
+# Local runtime state (database dumps, uploads, logs, pids)
+data/
+uploads/
+*.log
+*.pid
+*.sqlite
+*.db
+*.dump
+*.sql.gz
+
+# Local Docker volumes
+.docker-data/
+
+# Test artefacts
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+coverage/
+
+# OS noise
+.DS_Store
+Thumbs.db
+
+# Editor noise
+.idea/
+.vscode/
+*.swp

@@ -178,3 +178,94 @@ export interface CouponValidation {
 export function validateCoupon(code: string) {
   return apiRequest<CouponValidation>("/api/v1/checkout/coupon", { method: "POST", body: { code } });
 }
+
+// --- customer orders --------------------------------------------------------
+
+export interface OrderListItem {
+  id: string;
+  reference: string;
+  status: string;
+  grand_total_paise: number;
+  placed_at: string;
+  eta_min_minutes: number;
+  eta_max_minutes: number;
+  currency: string;
+  outlet_name: string;
+  payment_status: string;
+}
+
+export function listOrders(page = 1) {
+  return apiRequest<OrderListItem[]>("/api/v1/orders", { query: { page, limit: 10 } });
+}
+
+export interface OrderEvent {
+  id: number;
+  event_type: string;
+  from_state?: string | null;
+  to_state?: string | null;
+  actor_type: string;
+  reason?: string | null;
+  created_at: string;
+}
+
+export interface OrderDetail {
+  id: string;
+  reference: string;
+  status: string;
+  placed_at: string;
+  eta_min_minutes: number;
+  eta_max_minutes: number;
+  outlet: { id: string; name: string; phone: string };
+  breakdown: CheckoutBreakdown & { pricing_rule_version: number };
+  items: Array<{
+    id: string;
+    name: string;
+    is_veg: boolean;
+    quantity: number;
+    unit_price_paise: number;
+    item_total_paise: number;
+    special_instructions?: string | null;
+    modifiers: Array<{ group: string; option: string; price_delta_paise: number }>;
+  }>;
+  events: OrderEvent[];
+  payment: { present: boolean; payment: PaymentView };
+  refunds: Array<{ id: string; amount_paise: number; status: string; reason: string; created_at: string }>;
+  address?: string;
+  rider?: { name: string; phone?: string | null };
+  instructions?: string | null;
+  can_cancel: boolean;
+}
+
+export interface PaymentView {
+  id: string;
+  method: string;
+  status: string;
+  amount_paise: number;
+  failure_reason?: string | null;
+  simulated: boolean;
+}
+
+export function getOrder(id: string) {
+  return apiRequest<OrderDetail>(`/api/v1/orders/${id}`);
+}
+
+export function cancelOrder(id: string, reason: string) {
+  return apiRequest<{ status: string; refund_initiated: boolean }>(`/api/v1/orders/${id}/cancel`, {
+    method: "POST",
+    body: { reason },
+  });
+}
+
+export function simulatePayment(paymentId: string, outcome: "success" | "failure") {
+  return apiRequest<{ payment_id: string; status: string; simulated: boolean; demo_note: string }>(
+    `/api/v1/payments/${paymentId}/simulate`,
+    { method: "POST", body: { outcome } },
+  );
+}
+
+export function requestRefund(orderId: string, reason: string) {
+  return apiRequest<{ refund_status: string; simulated: boolean }>(`/api/v1/orders/${orderId}/refund`, {
+    method: "POST",
+    body: { reason },
+  });
+}

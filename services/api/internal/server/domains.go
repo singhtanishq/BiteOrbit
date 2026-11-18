@@ -8,6 +8,8 @@ import (
 	"biteorbit/services/api/internal/checkout"
 	"biteorbit/services/api/internal/discovery"
 	"biteorbit/services/api/internal/httpx"
+	"biteorbit/services/api/internal/orders"
+	"biteorbit/services/api/internal/payments"
 	"biteorbit/services/api/internal/users"
 )
 
@@ -28,6 +30,46 @@ func registerDomainRoutes(rg *httpx.Registry, deps Deps) {
 	registerDiscoveryRoutes(rg, deps)
 	registerCartRoutes(rg, deps)
 	registerCheckoutRoutes(rg, deps)
+	registerOrderRoutes(rg, deps)
+	registerPaymentRoutes(rg, deps)
+}
+
+func registerOrderRoutes(rg *httpx.Registry, deps Deps) {
+	o := orders.NewHandlers(deps.Pool)
+	auth := deps.Auth.RequireAuth
+
+	rg.Handle(http.MethodGet, "/api/v1/orders", httpx.RouteMeta{
+		Summary: "Caller's order history (paginated)", Tag: "orders", Auth: "any",
+	}, auth(o.List))
+
+	rg.Handle(http.MethodGet, "/api/v1/orders/{id}", httpx.RouteMeta{
+		Summary: "Order detail with timeline (owner-only)", Tag: "orders", Auth: "any",
+	}, auth(o.Get))
+
+	rg.Handle(http.MethodPost, "/api/v1/orders/{id}/cancel", httpx.RouteMeta{
+		Summary: "Cancel an order within the policy window (owner-only)", Tag: "orders", Auth: "any",
+	}, auth(o.Cancel))
+}
+
+func registerPaymentRoutes(rg *httpx.Registry, deps Deps) {
+	pm := payments.NewHandlers(deps.Pool)
+	auth := deps.Auth.RequireAuth
+
+	rg.Handle(http.MethodGet, "/api/v1/orders/{id}/payment", httpx.RouteMeta{
+		Summary: "Latest payment for an owned order", Tag: "payments", Auth: "any",
+	}, auth(pm.ByOrder))
+
+	rg.Handle(http.MethodPost, "/api/v1/payments/{id}/simulate", httpx.RouteMeta{
+		Summary: "Simulated gateway result (mock provider only; goes through the signed webhook path)", Tag: "payments", Auth: "any",
+	}, auth(pm.Simulate))
+
+	rg.Handle(http.MethodPost, "/api/v1/orders/{id}/refund", httpx.RouteMeta{
+		Summary: "Request a refund for a captured online payment (owner-only)", Tag: "payments", Auth: "any",
+	}, auth(pm.RequestRefund))
+
+	rg.Handle(http.MethodPost, "/api/v1/webhooks/mock", httpx.RouteMeta{
+		Summary: "Mock provider webhook (HMAC-verified, idempotent)", Tag: "webhooks", Auth: "public",
+	}, pm.Webhook)
 }
 
 func registerCheckoutRoutes(rg *httpx.Registry, deps Deps) {

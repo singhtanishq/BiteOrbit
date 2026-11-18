@@ -61,6 +61,20 @@ func writeJSON(w http.ResponseWriter, r *http.Request, status int, payload Envel
 	_ = enc.Encode(payload)
 }
 
+// LimitedBody reads up to max bytes of the raw request body.
+func LimitedBody(r *http.Request, max int64) []byte {
+	buf := make([]byte, 0, max)
+	b := make([]byte, 4096)
+	for int64(len(buf)) < max {
+		n, err := r.Body.Read(b)
+		buf = append(buf, b[:n]...)
+		if err != nil {
+			break
+		}
+	}
+	return buf
+}
+
 // DecodeJSON strictly parses a JSON request body into dst with a size cap.
 func DecodeJSON(w http.ResponseWriter, r *http.Request, dst any) error {
 	r.Body = http.MaxBytesReader(w, r.Body, 1<<20) // 1 MiB cap

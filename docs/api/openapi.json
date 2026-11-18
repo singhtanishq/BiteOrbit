@@ -6,6 +6,158 @@
   },
   "openapi": "3.0.3",
   "paths": {
+    "/api/v1/auth/login": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [],
+        "summary": "Sign in (enumeration-safe, rate limited)",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/v1/auth/logout": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "summary": "Revoke the current session",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/v1/auth/logout-all": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "summary": "Revoke every session for the caller",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/v1/auth/password-reset": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [],
+        "summary": "Request a password reset email (enumeration-safe)",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/v1/auth/password-reset/confirm": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [],
+        "summary": "Consume a reset token and set a new password",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/v1/auth/refresh": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "summary": "Rotate the session token",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/v1/auth/register": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [],
+        "summary": "Create a customer account and start a session",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/v1/auth/session": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "summary": "Current session principal",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
     "/api/v1/healthz": {
       "get": {
         "responses": {
@@ -20,6 +172,147 @@
         "summary": "Liveness probe",
         "tags": [
           "system"
+        ]
+      }
+    },
+    "/api/v1/me": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "summary": "Caller profile and preferences",
+        "tags": [
+          "me"
+        ]
+      },
+      "patch": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "summary": "Update profile fields",
+        "tags": [
+          "me"
+        ]
+      }
+    },
+    "/api/v1/me/addresses": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "summary": "List the caller's addresses",
+        "tags": [
+          "addresses"
+        ]
+      },
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "summary": "Create an address",
+        "tags": [
+          "addresses"
+        ]
+      }
+    },
+    "/api/v1/me/addresses/{id}": {
+      "delete": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "summary": "Soft-delete an owned address",
+        "tags": [
+          "addresses"
+        ]
+      },
+      "patch": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "summary": "Update an owned address",
+        "tags": [
+          "addresses"
+        ]
+      }
+    },
+    "/api/v1/me/addresses/{id}/default": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "summary": "Set an owned address as default",
+        "tags": [
+          "addresses"
         ]
       }
     },

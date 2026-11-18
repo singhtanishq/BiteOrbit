@@ -191,18 +191,16 @@ func (m *MemoryRateLimiter) Allow(key string, limit int, window time.Duration) b
 	return true
 }
 
-// RateLimit enforces per-key limits for sensitive routes.
-func RateLimit(limiter RateLimiter, keyFn func(r *http.Request) string, limit int, window time.Duration) func(http.Handler) http.Handler {
-	return func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if !limiter.Allow(keyFn(r), limit, window) {
-				w.Header().Set("Retry-After", "60")
-				Fail(w, r, http.StatusTooManyRequests, "rate_limited",
-					"Too many requests. Please slow down.", nil)
-				return
-			}
-			next.ServeHTTP(w, r)
-		})
+// RateLimit wraps a handler with per-key limits for sensitive routes.
+func RateLimit(limiter RateLimiter, keyFn func(r *http.Request) string, limit int, window time.Duration, next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if !limiter.Allow(keyFn(r), limit, window) {
+			w.Header().Set("Retry-After", "60")
+			Fail(w, r, http.StatusTooManyRequests, "rate_limited",
+				"Too many requests. Please slow down.", nil)
+			return
+		}
+		next(w, r)
 	}
 }
 

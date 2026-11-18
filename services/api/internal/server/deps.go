@@ -22,6 +22,12 @@ type Deps struct {
 	Limit httpx.RateLimiter
 	Email notify.EmailSender
 	SMS   notify.SMSSender
+
+	// Test hooks: allow integration tests to relax rate limits (0 = default).
+	LoginRateLimit        int
+	ResetRateLimit        int
+	ResetConfirmRateLimit int
+	RegisterRateLimit     int
 }
 
 // BuildDeps constructs the dependency graph based on configuration. Local
@@ -59,7 +65,7 @@ func BuildDeps(cfg *config.Config, pool *pgxpool.Pool, log *slog.Logger) (Deps, 
 		Cfg:   cfg,
 		Pool:  pool,
 		Log:   log,
-		Auth:  auth.NewService(pool, cfg.CookieDomain, false),
+		Auth:  auth.NewService(pool, cfg.CookieDomain, false, email),
 		Limit: limiter,
 		Email: email,
 		SMS:   sms,

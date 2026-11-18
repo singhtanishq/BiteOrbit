@@ -18,7 +18,7 @@ func testRegistry(t *testing.T) (*httpx.Registry, *config.Config) {
 	cfg := &config.Config{Env: config.EnvTest, AllowedOrigins: []string{"http://localhost:3000"}}
 	deps := Deps{
 		Cfg:   cfg,
-		Auth:  auth.NewService(nil, "", false),
+		Auth:  auth.NewService(nil, "", false, nil),
 		Limit: httpx.NewMemoryRateLimiter(),
 	}
 	_, rg, err := New(deps)

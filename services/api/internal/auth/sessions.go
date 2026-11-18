@@ -12,6 +12,8 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5"
+
+	"biteorbit/services/api/internal/platform/notify"
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"biteorbit/services/api/internal/apperr"
@@ -31,10 +33,11 @@ type Service struct {
 	pool         *pgxpool.Pool
 	cookieDomain string
 	secureCookie bool
+	email        notify.EmailSender
 }
 
-func NewService(pool *pgxpool.Pool, cookieDomain string, secureCookie bool) *Service {
-	return &Service{pool: pool, cookieDomain: cookieDomain, secureCookie: secureCookie}
+func NewService(pool *pgxpool.Pool, cookieDomain string, secureCookie bool, email notify.EmailSender) *Service {
+	return &Service{pool: pool, cookieDomain: cookieDomain, secureCookie: secureCookie, email: email}
 }
 
 type sessionRow struct {

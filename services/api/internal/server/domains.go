@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"biteorbit/services/api/internal/cart"
+	"biteorbit/services/api/internal/checkout"
 	"biteorbit/services/api/internal/discovery"
 	"biteorbit/services/api/internal/httpx"
 	"biteorbit/services/api/internal/users"
@@ -26,6 +27,28 @@ func registerDomainRoutes(rg *httpx.Registry, deps Deps) {
 	registerMeRoutes(rg, deps)
 	registerDiscoveryRoutes(rg, deps)
 	registerCartRoutes(rg, deps)
+	registerCheckoutRoutes(rg, deps)
+}
+
+func registerCheckoutRoutes(rg *httpx.Registry, deps Deps) {
+	c := checkout.NewHandlers(deps.Pool)
+	auth := deps.Auth.RequireAuth
+	placeLimiter := deps.PlaceRateLimit
+	if placeLimiter <= 0 {
+		placeLimiter = 20
+	}
+
+	rg.Handle(http.MethodPost, "/api/v1/checkout/quote", httpx.RouteMeta{
+		Summary: "Compute the authoritative price quote for the current cart", Tag: "checkout", Auth: "any",
+	}, auth(c.Quote))
+
+	rg.Handle(http.MethodPost, "/api/v1/checkout/place", httpx.RouteMeta{
+		Summary: "Place an order from a valid quote (Idempotency-Key required)", Tag: "checkout", Auth: "any",
+	}, httpx.RateLimit(deps.Limit, httpx.KeyByIP, placeLimiter, time.Minute, auth(c.Place)))
+
+	rg.Handle(http.MethodPost, "/api/v1/checkout/coupon", httpx.RouteMeta{
+		Summary: "Validate a coupon against the current cart subtotal", Tag: "coupons", Auth: "any",
+	}, auth(c.ValidateCoupon))
 }
 
 func registerCartRoutes(rg *httpx.Registry, deps Deps) {

@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"net"
 	"net/http"
+	"runtime/debug"
 	"strings"
 	"sync"
 	"time"
@@ -57,7 +58,8 @@ func SecurityHeaders(next http.Handler) http.Handler {
 	})
 }
 
-// Recover converts panics into 500s with structured logs (no stack leak).
+// Recover converts panics into 500s with structured logs (no stack leak to
+// the client; the stack is logged server-side for debugging).
 func Recover(log *slog.Logger) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -66,7 +68,8 @@ func Recover(log *slog.Logger) func(http.Handler) http.Handler {
 					log.ErrorContext(r.Context(), "panic recovered",
 						slog.String("request_id", RequestIDFrom(r.Context())),
 						slog.String("path", r.URL.Path),
-						slog.Any("panic", rec))
+						slog.Any("panic", rec),
+						slog.String("stack", string(debug.Stack())))
 					Fail(w, r, http.StatusInternalServerError, "internal_error",
 						"Something went wrong. Please try again.", nil)
 				}

@@ -259,6 +259,69 @@
         ]
       }
     },
+    "/api/v1/checkout/coupon": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "summary": "Validate a coupon against the current cart subtotal",
+        "tags": [
+          "coupons"
+        ]
+      }
+    },
+    "/api/v1/checkout/place": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "summary": "Place an order from a valid quote (Idempotency-Key required)",
+        "tags": [
+          "checkout"
+        ]
+      }
+    },
+    "/api/v1/checkout/quote": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "summary": "Compute the authoritative price quote for the current cart",
+        "tags": [
+          "checkout"
+        ]
+      }
+    },
     "/api/v1/discovery/collections": {
       "get": {
         "responses": {

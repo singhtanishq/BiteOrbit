@@ -48,7 +48,7 @@ func (s *seeder) seedCoupons() error {
 			 $9,$10,$11,$12,$13,$14)`
 		if _, err := s.tx.Exec(s.ctx, query,
 			c.code, c.title, c.desc, c.kind, c.percentBP, c.fixedPaise, c.capPaise, c.minOrder,
-			c.endsOffsetDays >= 0, c.perUser, c.funding, outletID, c.newUsersOnly, s.adminID); err != nil {
+			true, c.perUser, c.funding, outletID, c.newUsersOnly, s.adminID); err != nil {
 			return err
 		}
 		_ = i

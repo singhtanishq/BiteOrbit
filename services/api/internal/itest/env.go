@@ -126,6 +126,7 @@ func MainStart() *Env {
 		ResetRateLimit:        1000,
 		ResetConfirmRateLimit: 1000,
 		RegisterRateLimit:     1000,
+		PlaceRateLimit:        1000,
 	}
 
 	handler, _, err := server.New(deps)
@@ -196,6 +197,39 @@ func (e *Env) Do(t *testing.T, jar *cookiejar.Jar, method, path string, body any
 	return res.StatusCode, env
 }
 
+// DoWithHeader performs a request with extra headers (e.g. Idempotency-Key).
+func (e *Env) DoWithHeader(t *testing.T, jar *cookiejar.Jar, method, path string, body any, headers map[string]string) (int, Envelope) {
+	t.Helper()
+	var reader *bytes.Reader
+	if body != nil {
+		raw, err := json.Marshal(body)
+		if err != nil {
+			t.Fatalf("marshal body: %v", err)
+		}
+		reader = bytes.NewReader(raw)
+	} else {
+		reader = bytes.NewReader(nil)
+	}
+	req, err := http.NewRequest(method, e.URL+path, reader)
+	if err != nil {
+		t.Fatalf("new request: %v", err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Origin", "http://localhost:3000")
+	for k, v := range headers {
+		req.Header.Set(k, v)
+	}
+	client := &http.Client{Timeout: 20 * time.Second, Jar: jar}
+	res, err := client.Do(req)
+	if err != nil {
+		t.Fatalf("request %s %s: %v", method, path, err)
+	}
+	defer res.Body.Close()
+	var env Envelope
+	_ = json.NewDecoder(res.Body).Decode(&env)
+	return res.StatusCode, env
+}
+
 // Envelope mirrors the API response shape for tests.
 type Envelope struct {
 	Data  json.RawMessage `json:"data"`
@@ -210,7 +244,13 @@ type Envelope struct {
 // RegisterCustomer registers a fresh customer via the API and returns the id.
 func (e *Env) RegisterCustomer(t *testing.T, email string) string {
 	t.Helper()
-	jar := e.NewJar()
+	return e.RegisterCustomerWithJar(t, e.NewJar(), email)
+}
+
+// RegisterCustomerWithJar registers a customer keeping the session cookie in
+// the provided jar (registration starts a session).
+func (e *Env) RegisterCustomerWithJar(t *testing.T, jar *cookiejar.Jar, email string) string {
+	t.Helper()
 	status, env := e.Do(t, jar, "POST", "/api/v1/auth/register", map[string]any{
 		"email": email, "password": "Passw0rdLocal!", "name": "Test Customer",
 	})

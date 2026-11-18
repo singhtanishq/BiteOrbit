@@ -28,6 +28,7 @@ type Deps struct {
 	ResetRateLimit        int
 	ResetConfirmRateLimit int
 	RegisterRateLimit     int
+	PlaceRateLimit        int
 }
 
 // BuildDeps constructs the dependency graph based on configuration. Local

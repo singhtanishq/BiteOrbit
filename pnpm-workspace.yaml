@@ -3,9 +3,9 @@ packages:
   - "packages/*"
   - "e2e"
 
-onlyBuiltDependencies:
-  - "esbuild"
-  - "@tailwindcss/oxide"
-  - "sharp"
-  - "unrs-resolver"
-  - "@parcel/watcher"
+allowBuilds:
+  esbuild: true
+  "@tailwindcss/oxide": true
+  sharp: true
+  unrs-resolver: true
+  "@parcel/watcher": true

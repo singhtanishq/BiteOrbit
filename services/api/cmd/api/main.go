@@ -58,6 +58,12 @@ func main() {
 	go dispatcher.Run()
 	defer dispatcher.Stop()
 
+	// Janitor: auto-reject stale orders past the acceptance window, prune
+	// expired idempotency records (documented in the state machine doc).
+	janitor := workers.NewJanitor(pool, log)
+	go janitor.Run()
+	defer janitor.Stop()
+
 	srv := &http.Server{
 		Addr:              cfg.HTTPAddr,
 		Handler:           handler,

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { friendlyError, listOrders, OrderListItem } from "@biteorbit/api-client";
 import { Badge, Button, Card, CardBody, EmptyState, Skeleton, formatINR } from "@biteorbit/ui";
 import { useSession } from "@/lib/useSession";
-import { StatusChip } from "@/components/StatusChip";
+import { StatusChip } from "@biteorbit/ui";
 
 export default function OrdersPage() {
   const { user, loaded } = useSession();

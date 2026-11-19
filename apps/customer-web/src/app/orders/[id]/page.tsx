@@ -12,7 +12,7 @@ import {
   simulatePayment,
 } from "@biteorbit/api-client";
 import { Badge, Button, Card, CardBody, CardHeader, CardTitle, EmptyState, Skeleton, cx, formatINR } from "@biteorbit/ui";
-import { StatusChip } from "@/components/StatusChip";
+import { StatusChip } from "@biteorbit/ui";
 import { PaymentChip } from "../page";
 
 const TIMELINE_ORDER = [

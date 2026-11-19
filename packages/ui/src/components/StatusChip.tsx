@@ -1,4 +1,4 @@
-import { Badge } from "@biteorbit/ui";
+import { Badge } from "./Badge";
 
 const STATUS_MAP: Record<string, { tone: "leaf" | "marigold" | "berry" | "neutral" | "sky" | "coral"; label: string }> = {
   pending_payment: { tone: "sky", label: "Payment pending" },
@@ -14,6 +14,12 @@ const STATUS_MAP: Record<string, { tone: "leaf" | "marigold" | "berry" | "neutra
   cancel_requested: { tone: "marigold", label: "Cancelling" },
   cancelled: { tone: "neutral", label: "Cancelled" },
   delivery_failed: { tone: "berry", label: "Delivery failed" },
+  // delivery assignment statuses
+  assigned: { tone: "sky", label: "Offer sent" },
+  accepted: { tone: "coral", label: "Accepted" },
+  arriving_at_restaurant: { tone: "coral", label: "Arriving at outlet" },
+  arrived_at_restaurant: { tone: "coral", label: "At outlet" },
+  expired: { tone: "neutral", label: "Offer expired" },
 };
 
 export function StatusChip({ status }: { status: string }) {

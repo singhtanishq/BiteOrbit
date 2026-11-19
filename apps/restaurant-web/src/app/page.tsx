@@ -1,14 +1,16 @@
-export default function HomePage() {
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+
+export default function PortalHome() {
+  const router = useRouter();
+  useEffect(() => {
+    router.replace("/dashboard");
+  }, [router]);
   return (
-    <main className="mx-auto max-w-6xl px-4 py-10">
-      <section className="rounded-2xl bg-cream-100 px-6 py-12 text-center border border-ink-100">
-        <h1 className="text-3xl font-extrabold tracking-tight text-ink-900">
-          Restaurant console shell
-        </h1>
-        <p className="mx-auto mt-3 max-w-xl text-sm text-ink-600">
-          Order queue and menu management arrive with Milestone 08.
-        </p>
-      </section>
+    <main className="mx-auto max-w-md px-4 py-16 text-center">
+      <p className="text-sm text-ink-500">Loading partner console…</p>
     </main>
   );
 }

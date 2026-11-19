@@ -10,3 +10,4 @@ export { Input, Select, Textarea } from "./components/Input";
 export type { InputProps, SelectProps, TextareaProps } from "./components/Input";
 export { DemoBanner } from "./components/DemoBanner";
 export { EmptyState, Skeleton, Spinner } from "./components/EmptyState";
+export { StatusChip } from "./components/StatusChip";

@@ -742,6 +742,195 @@
         ]
       }
     },
+    "/api/v1/restaurant-portal/analytics": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionRole": "restaurant roles"
+          }
+        ],
+        "summary": "Outlet analytics summary with documented metric definitions",
+        "tags": [
+          "restaurant-portal"
+        ]
+      }
+    },
+    "/api/v1/restaurant-portal/menu": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionRole": "restaurant roles"
+          }
+        ],
+        "summary": "Outlet menu for management (includes unavailable items)",
+        "tags": [
+          "restaurant-portal"
+        ]
+      }
+    },
+    "/api/v1/restaurant-portal/menu/items/{id}": {
+      "patch": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionRole": "restaurant roles"
+          }
+        ],
+        "summary": "Update item name/description/price/availability (audited)",
+        "tags": [
+          "restaurant-portal"
+        ]
+      }
+    },
+    "/api/v1/restaurant-portal/orders": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionRole": "restaurant roles"
+          }
+        ],
+        "summary": "Outlet order queue with item summaries",
+        "tags": [
+          "restaurant-portal"
+        ]
+      }
+    },
+    "/api/v1/restaurant-portal/orders/{id}/accept": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionRole": "restaurant roles"
+          }
+        ],
+        "summary": "Accept a placed order",
+        "tags": [
+          "restaurant-portal"
+        ]
+      }
+    },
+    "/api/v1/restaurant-portal/orders/{id}/prepare": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionRole": "restaurant roles"
+          }
+        ],
+        "summary": "Move a confirmed order to preparing",
+        "tags": [
+          "restaurant-portal"
+        ]
+      }
+    },
+    "/api/v1/restaurant-portal/orders/{id}/ready": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionRole": "restaurant roles"
+          }
+        ],
+        "summary": "Mark a preparing order ready for pickup",
+        "tags": [
+          "restaurant-portal"
+        ]
+      }
+    },
+    "/api/v1/restaurant-portal/orders/{id}/reject": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionRole": "restaurant roles"
+          }
+        ],
+        "summary": "Reject a placed order with a reason",
+        "tags": [
+          "restaurant-portal"
+        ]
+      }
+    },
+    "/api/v1/restaurant-portal/outlets": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionRole": "restaurant roles"
+          }
+        ],
+        "summary": "Outlets accessible to this staff member",
+        "tags": [
+          "restaurant-portal"
+        ]
+      }
+    },
     "/api/v1/restaurants/{id}": {
       "get": {
         "responses": {

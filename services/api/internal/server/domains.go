@@ -10,6 +10,7 @@ import (
 	"biteorbit/services/api/internal/httpx"
 	"biteorbit/services/api/internal/orders"
 	"biteorbit/services/api/internal/payments"
+	"biteorbit/services/api/internal/portal"
 	"biteorbit/services/api/internal/users"
 )
 
@@ -32,6 +33,48 @@ func registerDomainRoutes(rg *httpx.Registry, deps Deps) {
 	registerCheckoutRoutes(rg, deps)
 	registerOrderRoutes(rg, deps)
 	registerPaymentRoutes(rg, deps)
+	registerPortalRoutes(rg, deps)
+}
+
+func registerPortalRoutes(rg *httpx.Registry, deps Deps) {
+	pt := portal.NewHandlers(deps.Pool)
+	auth := deps.Auth.RequireRole("restaurant_owner", "restaurant_manager", "restaurant_staff")
+
+	rg.Handle(http.MethodGet, "/api/v1/restaurant-portal/outlets", httpx.RouteMeta{
+		Summary: "Outlets accessible to this staff member", Tag: "restaurant-portal", Auth: "restaurant roles",
+	}, auth(pt.MyOutlets))
+
+	rg.Handle(http.MethodGet, "/api/v1/restaurant-portal/orders", httpx.RouteMeta{
+		Summary: "Outlet order queue with item summaries", Tag: "restaurant-portal", Auth: "restaurant roles",
+	}, auth(pt.ListOutletOrders))
+
+	rg.Handle(http.MethodGet, "/api/v1/restaurant-portal/menu", httpx.RouteMeta{
+		Summary: "Outlet menu for management (includes unavailable items)", Tag: "restaurant-portal", Auth: "restaurant roles",
+	}, auth(pt.OutletMenu))
+
+	rg.Handle(http.MethodPatch, "/api/v1/restaurant-portal/menu/items/{id}", httpx.RouteMeta{
+		Summary: "Update item name/description/price/availability (audited)", Tag: "restaurant-portal", Auth: "restaurant roles",
+	}, auth(pt.UpdateMenuItem))
+
+	rg.Handle(http.MethodGet, "/api/v1/restaurant-portal/analytics", httpx.RouteMeta{
+		Summary: "Outlet analytics summary with documented metric definitions", Tag: "restaurant-portal", Auth: "restaurant roles",
+	}, auth(pt.Analytics))
+
+	rg.Handle(http.MethodPost, "/api/v1/restaurant-portal/orders/{id}/accept", httpx.RouteMeta{
+		Summary: "Accept a placed order", Tag: "restaurant-portal", Auth: "restaurant roles",
+	}, auth(pt.Accept))
+
+	rg.Handle(http.MethodPost, "/api/v1/restaurant-portal/orders/{id}/reject", httpx.RouteMeta{
+		Summary: "Reject a placed order with a reason", Tag: "restaurant-portal", Auth: "restaurant roles",
+	}, auth(pt.Reject))
+
+	rg.Handle(http.MethodPost, "/api/v1/restaurant-portal/orders/{id}/prepare", httpx.RouteMeta{
+		Summary: "Move a confirmed order to preparing", Tag: "restaurant-portal", Auth: "restaurant roles",
+	}, auth(pt.StartPrepare))
+
+	rg.Handle(http.MethodPost, "/api/v1/restaurant-portal/orders/{id}/ready", httpx.RouteMeta{
+		Summary: "Mark a preparing order ready for pickup", Tag: "restaurant-portal", Auth: "restaurant roles",
+	}, auth(pt.MarkReady))
 }
 
 func registerOrderRoutes(rg *httpx.Registry, deps Deps) {

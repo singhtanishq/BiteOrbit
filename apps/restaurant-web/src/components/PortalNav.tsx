@@ -31,10 +31,12 @@ export function useOutletScope() {
         const rows = await listPortalOutlets();
         if (!alive) return;
         setOutlets(rows);
-        if (rows.length > 0) setOutletId((prev) => prev || rows[0].id);
+        const first = rows[0];
+        if (first) setOutletId((prev) => prev || first.id);
         setReady(true);
       } catch (err) {
-        if (friendlyError(err).includes("sign in")) {
+        const msg = friendlyError(err);
+        if (msg.includes("sign in") || msg.includes("Please")) {
           router.replace("/login");
         }
         if (alive) setReady(true);

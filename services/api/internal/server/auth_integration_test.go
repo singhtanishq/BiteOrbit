@@ -18,6 +18,8 @@ import (
 
 var env *itest.Env
 
+func testLogger() *slog.Logger { return slog.Default() }
+
 func TestMain(m *testing.M) {
 	env = itest.MainStart()
 	// Deterministic demo dataset for the whole package run.

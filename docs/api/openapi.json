@@ -322,6 +322,153 @@
         ]
       }
     },
+    "/api/v1/courier/assignments/{id}": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionRole": "rider"
+          }
+        ],
+        "summary": "Assignment detail with pickup/drop info and allowed transitions",
+        "tags": [
+          "courier"
+        ]
+      }
+    },
+    "/api/v1/courier/assignments/{id}/state": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionRole": "rider"
+          }
+        ],
+        "summary": "Advance the delivery lifecycle (OTP-verified delivery)",
+        "tags": [
+          "courier"
+        ]
+      }
+    },
+    "/api/v1/courier/availability": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionRole": "rider"
+          }
+        ],
+        "summary": "Go online/offline (approved riders only)",
+        "tags": [
+          "courier"
+        ]
+      }
+    },
+    "/api/v1/courier/earnings": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionRole": "rider"
+          }
+        ],
+        "summary": "Earnings ledger summary (rider-editable amounts never)",
+        "tags": [
+          "courier"
+        ]
+      }
+    },
+    "/api/v1/courier/me": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionRole": "rider"
+          }
+        ],
+        "summary": "Delivery partner profile",
+        "tags": [
+          "courier"
+        ]
+      }
+    },
+    "/api/v1/courier/offers": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionRole": "rider"
+          }
+        ],
+        "summary": "Open delivery offers (drop locality only until accepted)",
+        "tags": [
+          "courier"
+        ]
+      }
+    },
+    "/api/v1/courier/offers/{id}/accept": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionRole": "rider"
+          }
+        ],
+        "summary": "Atomically claim a delivery offer",
+        "tags": [
+          "courier"
+        ]
+      }
+    },
     "/api/v1/discovery/collections": {
       "get": {
         "responses": {
@@ -701,6 +848,27 @@
         "summary": "Request a refund for a captured online payment (owner-only)",
         "tags": [
           "payments"
+        ]
+      }
+    },
+    "/api/v1/orders/{id}/track": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "summary": "Owner-only live tracking with deterministic demo position",
+        "tags": [
+          "orders"
         ]
       }
     },

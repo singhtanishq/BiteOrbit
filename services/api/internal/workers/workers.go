@@ -30,8 +30,9 @@ func New(pool *pgxpool.Pool, cfg *config.Config, log *slog.Logger, email notify.
 	return &Workers{pool: pool, cfg: cfg, log: log, email: email, sms: sms}
 }
 
-// RegisterAll subscribes handlers to the dispatcher.
-func RegisterAll(d *outbox.Dispatcher, w *Workers) {
+// RegisterAll subscribes handlers to the dispatcher. The dispatch handler
+// auto-offers ready orders to available riders (see internal/dispatch).
+func RegisterAll(d *outbox.Dispatcher, w *Workers, dispatch outbox.Handler) {
 	for _, evtType := range []string{
 		"order.status_changed",
 		"order.rejected",
@@ -44,6 +45,9 @@ func RegisterAll(d *outbox.Dispatcher, w *Workers) {
 		"application.reviewed",
 	} {
 		d.Register(evtType, w)
+	}
+	if dispatch != nil {
+		d.Register("order.status_changed", dispatch)
 	}
 }
 

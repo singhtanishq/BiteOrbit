@@ -12,6 +12,7 @@ import (
 
 	"biteorbit/services/api/internal/config"
 	"biteorbit/services/api/internal/db"
+	"biteorbit/services/api/internal/dispatch"
 	"biteorbit/services/api/internal/outbox"
 	"biteorbit/services/api/internal/platform/notify"
 	"biteorbit/services/api/internal/workers"
@@ -37,7 +38,7 @@ func main() {
 	log.Info("worker starting", slog.String("env", string(cfg.Env)))
 	dispatcher := outbox.NewDispatcher(pool, log)
 	workers.RegisterAll(dispatcher, workers.New(pool, cfg, log,
-		&notify.ConsoleEmail{Log: log}, &notify.FakeSMS{Log: log}))
+		&notify.ConsoleEmail{Log: log}, &notify.FakeSMS{Log: log}), dispatch.NewHandler(pool, log))
 	go dispatcher.Run()
 
 	<-ctx.Done()

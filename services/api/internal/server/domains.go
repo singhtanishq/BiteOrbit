@@ -6,6 +6,7 @@ import (
 
 	"biteorbit/services/api/internal/cart"
 	"biteorbit/services/api/internal/checkout"
+	"biteorbit/services/api/internal/courier"
 	"biteorbit/services/api/internal/discovery"
 	"biteorbit/services/api/internal/httpx"
 	"biteorbit/services/api/internal/orders"
@@ -34,6 +35,40 @@ func registerDomainRoutes(rg *httpx.Registry, deps Deps) {
 	registerOrderRoutes(rg, deps)
 	registerPaymentRoutes(rg, deps)
 	registerPortalRoutes(rg, deps)
+	registerCourierRoutes(rg, deps)
+}
+
+func registerCourierRoutes(rg *httpx.Registry, deps Deps) {
+	c := courier.NewHandlers(deps.Pool)
+	auth := deps.Auth.RequireRole("rider")
+
+	rg.Handle(http.MethodGet, "/api/v1/courier/me", httpx.RouteMeta{
+		Summary: "Delivery partner profile", Tag: "courier", Auth: "rider",
+	}, auth(c.Profile))
+
+	rg.Handle(http.MethodPost, "/api/v1/courier/availability", httpx.RouteMeta{
+		Summary: "Go online/offline (approved riders only)", Tag: "courier", Auth: "rider",
+	}, auth(c.SetAvailability))
+
+	rg.Handle(http.MethodGet, "/api/v1/courier/offers", httpx.RouteMeta{
+		Summary: "Open delivery offers (drop locality only until accepted)", Tag: "courier", Auth: "rider",
+	}, auth(c.Offers))
+
+	rg.Handle(http.MethodPost, "/api/v1/courier/offers/{id}/accept", httpx.RouteMeta{
+		Summary: "Atomically claim a delivery offer", Tag: "courier", Auth: "rider",
+	}, auth(c.AcceptOffer))
+
+	rg.Handle(http.MethodGet, "/api/v1/courier/assignments/{id}", httpx.RouteMeta{
+		Summary: "Assignment detail with pickup/drop info and allowed transitions", Tag: "courier", Auth: "rider",
+	}, auth(c.Assignment))
+
+	rg.Handle(http.MethodPost, "/api/v1/courier/assignments/{id}/state", httpx.RouteMeta{
+		Summary: "Advance the delivery lifecycle (OTP-verified delivery)", Tag: "courier", Auth: "rider",
+	}, auth(c.UpdateAssignmentState))
+
+	rg.Handle(http.MethodGet, "/api/v1/courier/earnings", httpx.RouteMeta{
+		Summary: "Earnings ledger summary (rider-editable amounts never)", Tag: "courier", Auth: "rider",
+	}, auth(c.Earnings))
 }
 
 func registerPortalRoutes(rg *httpx.Registry, deps Deps) {
@@ -92,6 +127,10 @@ func registerOrderRoutes(rg *httpx.Registry, deps Deps) {
 	rg.Handle(http.MethodPost, "/api/v1/orders/{id}/cancel", httpx.RouteMeta{
 		Summary: "Cancel an order within the policy window (owner-only)", Tag: "orders", Auth: "any",
 	}, auth(o.Cancel))
+
+	rg.Handle(http.MethodGet, "/api/v1/orders/{id}/track", httpx.RouteMeta{
+		Summary: "Owner-only live tracking with deterministic demo position", Tag: "orders", Auth: "any",
+	}, auth(o.Track))
 }
 
 func registerPaymentRoutes(rg *httpx.Registry, deps Deps) {

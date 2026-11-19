@@ -14,6 +14,7 @@ import (
 
 	"biteorbit/services/api/internal/config"
 	"biteorbit/services/api/internal/db"
+	"biteorbit/services/api/internal/dispatch"
 	"biteorbit/services/api/internal/outbox"
 	"biteorbit/services/api/internal/server"
 	"biteorbit/services/api/internal/workers"
@@ -54,7 +55,8 @@ func main() {
 
 	// Outbox dispatcher: turns committed events into notifications/jobs.
 	dispatcher := outbox.NewDispatcher(pool, log)
-	workers.RegisterAll(dispatcher, workers.New(pool, cfg, log, deps.Email, deps.SMS))
+	workers.RegisterAll(dispatcher, workers.New(pool, cfg, log, deps.Email, deps.SMS),
+		dispatch.NewHandler(pool, log))
 	go dispatcher.Run()
 	defer dispatcher.Stop()
 

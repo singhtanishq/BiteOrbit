@@ -11,7 +11,7 @@ import { Button, EmptyState, Skeleton, cx, formatINR } from "@biteorbit/ui";
 import { StatusChip } from "@biteorbit/ui";
 
 const FILTERS = [
-  { value: "", label: "All open" },
+  { value: "", label: "All" },
   { value: "placed", label: "New" },
   { value: "restaurant_confirmed", label: "Accepted" },
   { value: "preparing", label: "Preparing" },
@@ -25,7 +25,7 @@ const FILTERS = [
 export default function OrdersQueuePage() {
   const { outlets, outlet, outletId, setOutletId, ready } = useOutletScope();
   const [orders, setOrders] = useState<PortalOrder[] | null>(null);
-  const [filter, setFilter] = useState<string>("placed");
+  const [filter, setFilter] = useState<string>("");
   const [error, setError] = useState("");
   const [busyId, setBusyId] = useState("");
   const [rejecting, setRejecting] = useState<PortalOrder | null>(null);

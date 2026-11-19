@@ -437,7 +437,12 @@ func registerAuthRoutes(rg *httpx.Registry, deps Deps) {
 	a := deps.Auth
 	loginLimiter := deps.LoginRateLimit
 	if loginLimiter <= 0 {
+		// Production default 10/min/IP; development uses a higher default
+		// because four local portals plus E2E logins share one IP.
 		loginLimiter = 10
+		if deps.Cfg.Env == "development" {
+			loginLimiter = 60
+		}
 	}
 	registerLimiter := deps.RegisterRateLimit
 	if registerLimiter <= 0 {

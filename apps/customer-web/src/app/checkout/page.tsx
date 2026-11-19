@@ -329,7 +329,7 @@ export default function CheckoutPage() {
               ) : quote ? (
                 <>
                   <p className="text-xs text-ink-500">
-                    {quote.outlet_name} → {quote.address_summary} · ~{quote.distance_km} km
+                    {quote.outlet_name} → {quote.address_summary} · ~{Math.round(quote.distance_km * 10) / 10} km
                     (straight-line estimate) · delivery in {quote.eta_min_minutes}–
                     {quote.eta_max_minutes} min (demo estimate)
                   </p>

@@ -81,7 +81,7 @@ func (h *Handlers) TicketDetail(w http.ResponseWriter, r *http.Request) {
 	}
 
 	type msgRow struct {
-		ID        int64     `json:"id"`
+		ID        string    `json:"id"`
 		Author    string    `json:"author_type"`
 		Body      string    `json:"body"`
 		Internal  bool      `json:"is_internal_note"`

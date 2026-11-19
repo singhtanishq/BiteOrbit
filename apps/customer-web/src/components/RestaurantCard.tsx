@@ -1,8 +1,64 @@
 "use client";
 
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { cx, formatINR } from "@biteorbit/ui";
+import { favouriteOutlet, unfavouriteOutlet } from "@biteorbit/api-client";
 import type { OutletSummary } from "@biteorbit/api-client";
+
+/** Heart toggle persisted via /me/favourites (anonymous users are sent to sign-in). */
+function FavButton({ outletId }: { outletId: string }) {
+  const [fav, setFav] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    fetch("/api/v1/me/favourites", { credentials: "same-origin" })
+      .then((r) => (r.ok ? r.json() : []))
+      .then((rows: Array<{ id: string }>) => {
+        if (alive) setFav(Array.isArray(rows) && rows.some((r) => r.id === outletId));
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, [outletId]);
+
+  const toggle = useCallback(
+    async (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (fav === null) {
+        window.location.href = "/account";
+        return;
+      }
+      try {
+        if (fav) {
+          await unfavouriteOutlet(outletId);
+          setFav(false);
+        } else {
+          await favouriteOutlet(outletId);
+          setFav(true);
+        }
+      } catch {
+        /* optimistic failure is invisible; state refreshes on next visit */
+      }
+    },
+    [fav, outletId],
+  );
+
+  return (
+    <button
+      onClick={toggle}
+      aria-pressed={fav === true}
+      aria-label={fav ? "Remove from favourites" : "Add to favourites"}
+      className="absolute right-3 top-3 rounded-full bg-white/95 p-1.5 shadow-card"
+    >
+      <span aria-hidden="true" className={cx("text-sm leading-none", fav ? "text-coral-500" : "text-ink-400")}>
+        {fav ? "♥" : "♡"}
+      </span>
+    </button>
+  );
+}
 
 /** Warm gradient placeholder used until real media is configured. */
 function OutletArt({ name, veg }: { name: string; veg: boolean }) {
@@ -34,6 +90,7 @@ export function RestaurantCard({ outlet }: { outlet: OutletSummary }) {
     >
       <div className="relative">
         <OutletArt name={outlet.name} veg={outlet.is_pure_veg} />
+        <FavButton outletId={outlet.id} />
         {outlet.is_pure_veg ? (
           <span className="absolute left-3 top-3 rounded-full bg-white/95 px-2 py-0.5 text-[11px] font-bold text-leaf-700">
             Pure veg

@@ -269,3 +269,107 @@ export function requestRefund(orderId: string, reason: string) {
     body: { reason },
   });
 }
+
+// --- P1: reviews, favourites, reorder, support, notifications ----------------
+
+export async function createReview(orderId: string, rating: number, comment: string, deliveryRating?: number) {
+  return apiRequest<{ id: string; outlet_id: string }>("/api/v1/reviews", {
+    method: "POST",
+    body: { order_id: orderId, rating, delivery_rating: deliveryRating ?? 0, comment },
+  });
+}
+
+export interface OutletReview {
+  rating: number;
+  delivery_rating: number;
+  comment?: string | null;
+  created_at: string;
+  customer_name: string;
+}
+
+export function outletReviews(id: string, page = 1) {
+  return apiRequest<OutletReview[]>(`/api/v1/restaurants/${id}/reviews`, { query: { page, limit: 10 } });
+}
+
+export function listFavourites() {
+  return apiRequest<Array<{ id: string; name: string; locality: string; city: string; rating: number; is_pure_veg: boolean }>>(
+    "/api/v1/me/favourites",
+  );
+}
+
+export function favouriteOutlet(outletId: string) {
+  return apiRequest<{ favourited: boolean }>(`/api/v1/me/favourites/${outletId}`, { method: "POST" });
+}
+
+export function unfavouriteOutlet(outletId: string) {
+  return apiRequest<{ removed: boolean }>(`/api/v1/me/favourites/${outletId}`, { method: "DELETE" });
+}
+
+export function reorder(orderId: string) {
+  return apiRequest<{ cart_id: string; added: number; skipped: number; skipped_reason?: string; replaced_other_outlet_cart: boolean }>(
+    `/api/v1/orders/${orderId}/reorder`,
+    { method: "POST" },
+  );
+}
+
+export interface SupportTicketRow {
+  id: string;
+  reference: string;
+  category: string;
+  subject: string;
+  status: string;
+  priority: string;
+  created_at: string;
+  updated_at: string;
+  replies: number;
+}
+
+export function createSupportTicket(category: string, subject: string, body: string, orderId?: string) {
+  return apiRequest<{ id: string; reference: string; message: string }>("/api/v1/support/tickets", {
+    method: "POST",
+    body: { category, subject, body, order_id: orderId || undefined },
+  });
+}
+
+export function mySupportTickets() {
+  return apiRequest<SupportTicketRow[]>("/api/v1/support/tickets");
+}
+
+export interface SupportThread {
+  ticket: { id: string; reference: string; category: string; subject: string; status: string; created_at: string };
+  messages: Array<{ id: string; author_type: string; body: string; created_at: string }>;
+}
+
+export function supportThread(id: string) {
+  return apiRequest<SupportThread>(`/api/v1/support/tickets/${id}`);
+}
+
+export function replySupportTicket(id: string, body: string) {
+  return apiRequest<{ replied: boolean }>(`/api/v1/support/tickets/${id}/messages`, {
+    method: "POST",
+    body: { body },
+  });
+}
+
+export interface AppNotification {
+  id: string;
+  category: string;
+  title: string;
+  body: string;
+  read_at?: string | null;
+  created_at: string;
+}
+
+export function listNotifications(unreadOnly?: boolean) {
+  return apiRequest<AppNotification[]>("/api/v1/notifications", {
+    query: { unread_only: unreadOnly ? "true" : undefined },
+  });
+}
+
+export function markNotificationRead(id: string) {
+  return apiRequest<{ read: boolean }>(`/api/v1/notifications/${id}/read`, { method: "POST" });
+}
+
+export function markAllNotificationsRead() {
+  return apiRequest<{ read: boolean }>("/api/v1/notifications/read-all", { method: "POST" });
+}

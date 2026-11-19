@@ -14,6 +14,7 @@ import (
 	"biteorbit/services/api/internal/orders"
 	"biteorbit/services/api/internal/payments"
 	"biteorbit/services/api/internal/portal"
+	"biteorbit/services/api/internal/reviews"
 	"biteorbit/services/api/internal/support"
 	"biteorbit/services/api/internal/users"
 )
@@ -42,6 +43,7 @@ func registerDomainRoutes(rg *httpx.Registry, deps Deps) {
 	registerAdminRoutes(rg, deps)
 	registerSupportRoutes(rg, deps)
 	registerNotificationRoutes(rg, deps)
+	registerReviewRoutes(rg, deps)
 }
 
 func registerAdminRoutes(rg *httpx.Registry, deps Deps) {
@@ -56,6 +58,10 @@ func registerAdminRoutes(rg *httpx.Registry, deps Deps) {
 	rg.Handle(http.MethodGet, "/api/v1/admin/orders", httpx.RouteMeta{
 		Summary: "Platform-wide order search", Tag: "admin", Auth: "admin roles",
 	}, adminOnly(a.ListOrders))
+
+	rg.Handle(http.MethodGet, "/api/v1/admin/orders/export.csv", httpx.RouteMeta{
+		Summary: "Orders report CSV export (ops roles)", Tag: "admin", Auth: "admin roles",
+	}, adminOnly(orders.AdminOrdersExport(deps.Pool)))
 
 	rg.Handle(http.MethodPost, "/api/v1/admin/orders/{id}/cancel", httpx.RouteMeta{
 		Summary: "Audited administrative cancellation (ops roles only)", Tag: "admin", Auth: "admin roles",
@@ -245,6 +251,10 @@ func registerPortalRoutes(rg *httpx.Registry, deps Deps) {
 		Summary: "Outlet analytics summary with documented metric definitions", Tag: "restaurant-portal", Auth: "restaurant roles",
 	}, auth(pt.Analytics))
 
+	rg.Handle(http.MethodGet, "/api/v1/restaurant-portal/analytics/export.csv", httpx.RouteMeta{
+		Summary: "Outlet sales report CSV export", Tag: "restaurant-portal", Auth: "restaurant roles",
+	}, auth(orders.RestaurantSalesExport(deps.Pool)))
+
 	rg.Handle(http.MethodPost, "/api/v1/restaurant-portal/orders/{id}/accept", httpx.RouteMeta{
 		Summary: "Accept a placed order", Tag: "restaurant-portal", Auth: "restaurant roles",
 	}, auth(pt.Accept))
@@ -281,6 +291,42 @@ func registerOrderRoutes(rg *httpx.Registry, deps Deps) {
 	rg.Handle(http.MethodGet, "/api/v1/orders/{id}/track", httpx.RouteMeta{
 		Summary: "Owner-only live tracking with deterministic demo position", Tag: "orders", Auth: "any",
 	}, auth(o.Track))
+
+	rg.Handle(http.MethodPost, "/api/v1/orders/{id}/reorder", httpx.RouteMeta{
+		Summary: "Rebuild the cart from a past order at current prices", Tag: "orders", Auth: "any",
+	}, auth(o.Reorder))
+
+	rg.Handle(http.MethodGet, "/api/v1/me/favourites", httpx.RouteMeta{
+		Summary: "Favourite outlets", Tag: "favourites", Auth: "any",
+	}, auth(o.ListFavourites))
+
+	rg.Handle(http.MethodPost, "/api/v1/me/favourites/{outlet_id}", httpx.RouteMeta{
+		Summary: "Favourite an outlet", Tag: "favourites", Auth: "any",
+	}, auth(o.AddFavourite))
+
+	rg.Handle(http.MethodDelete, "/api/v1/me/favourites/{outlet_id}", httpx.RouteMeta{
+		Summary: "Unfavourite an outlet", Tag: "favourites", Auth: "any",
+	}, auth(o.RemoveFavourite))
+}
+
+func registerReviewRoutes(rg *httpx.Registry, deps Deps) {
+	rv := reviews.NewHandlers(deps.Pool)
+
+	rg.Handle(http.MethodPost, "/api/v1/reviews", httpx.RouteMeta{
+		Summary: "Review a delivered order (once per order)", Tag: "reviews", Auth: "any",
+	}, deps.Auth.RequireAuth(rv.Create))
+
+	rg.Handle(http.MethodGet, "/api/v1/restaurants/{id}/reviews", httpx.RouteMeta{
+		Summary: "Published reviews for an outlet", Tag: "reviews", Auth: "public",
+	}, deps.Auth.OptionalAuth(rv.ListForOutlet))
+
+	rg.Handle(http.MethodPost, "/api/v1/reviews/{id}/report", httpx.RouteMeta{
+		Summary: "Report a review for moderation", Tag: "reviews", Auth: "any",
+	}, deps.Auth.RequireAuth(rv.Report))
+
+	rg.Handle(http.MethodGet, "/api/v1/me/reviews", httpx.RouteMeta{
+		Summary: "Caller's reviews", Tag: "reviews", Auth: "any",
+	}, deps.Auth.RequireAuth(rv.Mine))
 }
 
 func registerPaymentRoutes(rg *httpx.Registry, deps Deps) {

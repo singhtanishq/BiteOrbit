@@ -13,6 +13,7 @@ import (
 	"net/http/cookiejar"
 	"net/http/httptest"
 	"os"
+	"strings"
 	"testing"
 	"time"
 
@@ -229,6 +230,46 @@ func (e *Env) DoWithHeader(t *testing.T, jar *cookiejar.Jar, method, path string
 	var env Envelope
 	_ = json.NewDecoder(res.Body).Decode(&env)
 	return res.StatusCode, env
+}
+
+// RawResult captures a non-JSON response (CSV exports).
+type RawResult struct {
+	Status      int
+	ContentType string
+	Body        string
+}
+
+// DoRaw performs a request and returns the raw response details.
+func (e *Env) DoRaw(t *testing.T, jar *cookiejar.Jar, method, path string, body any) RawResult {
+	t.Helper()
+	var reader *bytes.Reader
+	if body != nil {
+		raw, err := json.Marshal(body)
+		if err != nil {
+			t.Fatalf("marshal: %v", err)
+		}
+		reader = bytes.NewReader(raw)
+	} else {
+		reader = bytes.NewReader(nil)
+	}
+	req, err := http.NewRequest(method, e.URL+path, reader)
+	if err != nil {
+		t.Fatalf("new request: %v", err)
+	}
+	req.Header.Set("Origin", "http://localhost:3000")
+	client := &http.Client{Timeout: 20 * time.Second, Jar: jar}
+	res, err := client.Do(req)
+	if err != nil {
+		t.Fatalf("request %s %s: %v", method, path, err)
+	}
+	defer res.Body.Close()
+	buf := make([]byte, 4096)
+	n, _ := res.Body.Read(buf)
+	return RawResult{
+		Status:      res.StatusCode,
+		ContentType: strings.TrimSpace(strings.SplitN(res.Header.Get("Content-Type"), ";", 2)[0]),
+		Body:        string(buf[:n]),
+	}
 }
 
 // Envelope mirrors the API response shape for tests.

@@ -66,7 +66,7 @@ func (h *Handlers) Analytics(w http.ResponseWriter, r *http.Request) {
 			COUNT(*) FILTER (WHERE status = 'rejected'),
 			COALESCE(SUM(grand_total_paise) FILTER (WHERE status = 'delivered'), 0),
 			COALESCE(SUM(items_subtotal_paise - coupon_discount_paise) FILTER (WHERE status = 'delivered'), 0),
-			COALESCE((SELECT AVG(EXTRACT(EPOCH FROM (ready_at - preparing_at))/60)
+			COALESCE((SELECT ROUND(AVG(EXTRACT(EPOCH FROM (ready_at - preparing_at))/60))
 				FROM orders WHERE outlet_id = $1 AND status='delivered'
 				AND preparing_at IS NOT NULL AND ready_at IS NOT NULL
 				AND created_at > now() - ($2 || ' days')::interval), 0)

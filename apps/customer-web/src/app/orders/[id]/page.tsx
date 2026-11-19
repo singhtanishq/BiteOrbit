@@ -5,9 +5,11 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import {
   cancelOrder,
+  createReview,
   friendlyError,
   getOrder,
   OrderDetail,
+  reorder,
   requestRefund,
   simulatePayment,
 } from "@biteorbit/api-client";
@@ -46,6 +48,10 @@ export default function OrderDetailPage() {
   const [notice, setNotice] = useState("");
   const [cancelOpen, setCancelOpen] = useState(false);
   const [reason, setReason] = useState("");
+  const [reviewOpen, setReviewOpen] = useState(false);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState("");
+  const [reorderNotice, setReorderNotice] = useState("");
 
   const load = useCallback(async () => {
     try {
@@ -73,6 +79,41 @@ export default function OrderDetailPage() {
         outcome === "success"
           ? "Payment captured via the simulated gateway (signed webhook path)."
           : "Payment failed (simulated). You can retry below.",
+      );
+    } catch (err) {
+      setError(friendlyError(err));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const submitReview = async () => {
+    if (!order) return;
+    setBusy(true);
+    setError("");
+    try {
+      await createReview(order.id, reviewRating, reviewComment.trim());
+      setReviewOpen(false);
+      setNotice("Thanks! Your review is live on the restaurant page.");
+      await load();
+    } catch (err) {
+      setError(friendlyError(err));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const doReorder = async () => {
+    if (!order) return;
+    setBusy(true);
+    setError("");
+    try {
+      const res = await reorder(order.id);
+      window.dispatchEvent(new CustomEvent("cart-updated"));
+      setReorderNotice(
+        `${res.added} item(s) added to your cart at current prices` +
+        (res.skipped > 0 ? `; ${res.skipped} unavailable item(s) skipped` : "") +
+        (res.replaced_other_outlet_cart ? " (replaced your other cart)" : "") + ".",
       );
     } catch (err) {
       setError(friendlyError(err));
@@ -343,6 +384,66 @@ export default function OrderDetailPage() {
           </dl>
         </CardBody>
       </Card>
+
+      {reorderNotice ? (
+        <p role="status" className="mt-4 rounded-lg bg-leaf-50 px-4 py-3 text-sm text-leaf-700">
+          {reorderNotice}{" "}
+          <Link href="/cart" className="font-bold underline">
+            Go to cart →
+          </Link>
+        </p>
+      ) : null}
+
+      {order.status === "delivered" ? (
+        <Card className="mt-4">
+          <CardBody>
+            {reviewOpen ? (
+              <div>
+                <p className="text-sm font-bold text-ink-900">Rate this order</p>
+                <div className="mt-2 flex gap-1" role="group" aria-label="Rating">
+                  {[1, 2, 3, 4, 5].map((n) => (
+                    <button
+                      key={n}
+                      onClick={() => setReviewRating(n)}
+                      aria-pressed={reviewRating === n}
+                      aria-label={`${n} star${n > 1 ? "s" : ""}`}
+                      className={cx(
+                        "text-2xl leading-none transition-transform",
+                        n <= reviewRating ? "text-marigold-500 scale-110" : "text-ink-300",
+                      )}
+                    >
+                      ★
+                    </button>
+                  ))}
+                  <span className="ml-2 self-center text-sm text-ink-600">{reviewRating}/5</span>
+                </div>
+                <textarea
+                  value={reviewComment}
+                  onChange={(e) => setReviewComment(e.target.value)}
+                  rows={3}
+                  maxLength={2000}
+                  aria-label="Review comment"
+                  placeholder="What did you think? (optional)"
+                  className="mt-3 w-full rounded-lg border border-ink-200 px-3 py-2 text-sm"
+                />
+                <div className="mt-2 flex gap-2">
+                  <Button size="sm" onClick={submitReview} loading={busy}>Submit review</Button>
+                  <Button size="sm" variant="ghost" onClick={() => setReviewOpen(false)}>Cancel</Button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                <Button size="sm" variant="secondary" onClick={() => setReviewOpen(true)}>
+                  ★ Rate this order
+                </Button>
+                <Button size="sm" variant="secondary" onClick={doReorder} loading={busy}>
+                  Reorder
+                </Button>
+              </div>
+            )}
+          </CardBody>
+        </Card>
+      ) : null}
 
       {/* cancel */}
       {order.can_cancel ? (

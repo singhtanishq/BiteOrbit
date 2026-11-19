@@ -193,6 +193,27 @@
         ]
       }
     },
+    "/api/v1/admin/orders/export.csv": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionRole": "admin roles"
+          }
+        ],
+        "summary": "Orders report CSV export (ops roles)",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
     "/api/v1/admin/orders/{id}/cancel": {
       "post": {
         "responses": {
@@ -1189,6 +1210,88 @@
         ]
       }
     },
+    "/api/v1/me/favourites": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "summary": "Favourite outlets",
+        "tags": [
+          "favourites"
+        ]
+      }
+    },
+    "/api/v1/me/favourites/{outlet_id}": {
+      "delete": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "summary": "Unfavourite an outlet",
+        "tags": [
+          "favourites"
+        ]
+      },
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "summary": "Favourite an outlet",
+        "tags": [
+          "favourites"
+        ]
+      }
+    },
+    "/api/v1/me/reviews": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "summary": "Caller's reviews",
+        "tags": [
+          "reviews"
+        ]
+      }
+    },
     "/api/v1/notifications": {
       "get": {
         "responses": {
@@ -1414,6 +1517,27 @@
         ]
       }
     },
+    "/api/v1/orders/{id}/reorder": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "summary": "Rebuild the cart from a past order at current prices",
+        "tags": [
+          "orders"
+        ]
+      }
+    },
     "/api/v1/orders/{id}/track": {
       "get": {
         "responses": {
@@ -1489,6 +1613,27 @@
           }
         ],
         "summary": "Outlet analytics summary with documented metric definitions",
+        "tags": [
+          "restaurant-portal"
+        ]
+      }
+    },
+    "/api/v1/restaurant-portal/analytics/export.csv": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionRole": "restaurant roles"
+          }
+        ],
+        "summary": "Outlet sales report CSV export",
         "tags": [
           "restaurant-portal"
         ]
@@ -1693,6 +1838,65 @@
         "summary": "Full menu with categories, items and modifier groups",
         "tags": [
           "restaurants"
+        ]
+      }
+    },
+    "/api/v1/restaurants/{id}/reviews": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [],
+        "summary": "Published reviews for an outlet",
+        "tags": [
+          "reviews"
+        ]
+      }
+    },
+    "/api/v1/reviews": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "summary": "Review a delivered order (once per order)",
+        "tags": [
+          "reviews"
+        ]
+      }
+    },
+    "/api/v1/reviews/{id}/report": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "summary": "Report a review for moderation",
+        "tags": [
+          "reviews"
         ]
       }
     },

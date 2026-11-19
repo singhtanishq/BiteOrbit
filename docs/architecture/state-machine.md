@@ -50,3 +50,12 @@ Rules enforced server-side (see tests in `internal/orders/*_test.go`):
    orders produce refund records; COD uses its own due/collected lifecycle.
 5. Concurrency: transitions use atomic conditional UPDATE … WHERE state = expected, so double
    accept / double deliver races lose safely and report the actual current state.
+
+## Auto-timeout policy
+
+Orders still in `placed` after **15 minutes** are auto-rejected by the janitor
+worker (`internal/workers/janitor.go`) with reason "no response within the
+acceptance window (demo policy)". Captured online payments are refunded
+(simulated locally) and COD dues cancelled; the customer receives the
+rejection through the notification worker. The window is a documented demo
+policy — production deployments would make it outlet-configurable.

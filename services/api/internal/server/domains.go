@@ -4,14 +4,17 @@ import (
 	"net/http"
 	"time"
 
+	"biteorbit/services/api/internal/admin"
 	"biteorbit/services/api/internal/cart"
 	"biteorbit/services/api/internal/checkout"
 	"biteorbit/services/api/internal/courier"
 	"biteorbit/services/api/internal/discovery"
 	"biteorbit/services/api/internal/httpx"
+	"biteorbit/services/api/internal/notifications"
 	"biteorbit/services/api/internal/orders"
 	"biteorbit/services/api/internal/payments"
 	"biteorbit/services/api/internal/portal"
+	"biteorbit/services/api/internal/support"
 	"biteorbit/services/api/internal/users"
 )
 
@@ -36,6 +39,153 @@ func registerDomainRoutes(rg *httpx.Registry, deps Deps) {
 	registerPaymentRoutes(rg, deps)
 	registerPortalRoutes(rg, deps)
 	registerCourierRoutes(rg, deps)
+	registerAdminRoutes(rg, deps)
+	registerSupportRoutes(rg, deps)
+	registerNotificationRoutes(rg, deps)
+}
+
+func registerAdminRoutes(rg *httpx.Registry, deps Deps) {
+	a := admin.NewHandlers(deps.Pool)
+	adminOnly := deps.Auth.RequireRole("admin", "ops_manager", "support_agent")
+	adminFull := deps.Auth.RequireRole("admin", "ops_manager")
+
+	rg.Handle(http.MethodGet, "/api/v1/admin/overview", httpx.RouteMeta{
+		Summary: "Platform metrics overview with documented definitions", Tag: "admin", Auth: "admin roles",
+	}, adminOnly(a.Overview))
+
+	rg.Handle(http.MethodGet, "/api/v1/admin/orders", httpx.RouteMeta{
+		Summary: "Platform-wide order search", Tag: "admin", Auth: "admin roles",
+	}, adminOnly(a.ListOrders))
+
+	rg.Handle(http.MethodPost, "/api/v1/admin/orders/{id}/cancel", httpx.RouteMeta{
+		Summary: "Audited administrative cancellation (ops roles only)", Tag: "admin", Auth: "admin roles",
+	}, adminFull(a.AdminCancel))
+
+	rg.Handle(http.MethodGet, "/api/v1/admin/users", httpx.RouteMeta{
+		Summary: "User list (data-minimised)", Tag: "admin", Auth: "admin roles",
+	}, adminOnly(a.ListUsers))
+
+	rg.Handle(http.MethodPost, "/api/v1/admin/users/{id}/suspend", httpx.RouteMeta{
+		Summary: "Suspend a user (audited, sessions revoked)", Tag: "admin", Auth: "admin roles",
+	}, adminFull(a.SuspendUser))
+
+	rg.Handle(http.MethodPost, "/api/v1/admin/users/{id}/activate", httpx.RouteMeta{
+		Summary: "Reactivate a user (audited)", Tag: "admin", Auth: "admin roles",
+	}, adminFull(a.ActivateUser))
+
+	rg.Handle(http.MethodGet, "/api/v1/admin/restaurants", httpx.RouteMeta{
+		Summary: "Organisations and outlets", Tag: "admin", Auth: "admin roles",
+	}, adminOnly(a.ListRestaurants))
+
+	rg.Handle(http.MethodGet, "/api/v1/admin/applications", httpx.RouteMeta{
+		Summary: "Restaurant applications", Tag: "admin", Auth: "admin roles",
+	}, adminOnly(a.ListApplications))
+
+	rg.Handle(http.MethodPost, "/api/v1/admin/applications/{id}/review", httpx.RouteMeta{
+		Summary: "Review an application (demo approval is a simulation)", Tag: "admin", Auth: "admin roles",
+	}, adminFull(a.ReviewApplication))
+
+	rg.Handle(http.MethodGet, "/api/v1/admin/riders", httpx.RouteMeta{
+		Summary: "Delivery partners with status and load", Tag: "admin", Auth: "admin roles",
+	}, adminOnly(a.ListRiders))
+
+	rg.Handle(http.MethodPost, "/api/v1/admin/riders/{id}/approve", httpx.RouteMeta{
+		Summary: "Approve a rider (audited)", Tag: "admin", Auth: "admin roles",
+	}, adminFull(a.ApproveRider))
+
+	rg.Handle(http.MethodPost, "/api/v1/admin/riders/{id}/suspend", httpx.RouteMeta{
+		Summary: "Suspend a rider (audited)", Tag: "admin", Auth: "admin roles",
+	}, adminFull(a.SuspendRider))
+
+	rg.Handle(http.MethodGet, "/api/v1/admin/coupons", httpx.RouteMeta{
+		Summary: "Coupon management list", Tag: "admin", Auth: "admin roles",
+	}, adminOnly(a.ListCoupons))
+
+	rg.Handle(http.MethodPost, "/api/v1/admin/coupons", httpx.RouteMeta{
+		Summary: "Create a coupon (audited)", Tag: "admin", Auth: "admin roles",
+	}, adminFull(a.CreateCoupon))
+
+	rg.Handle(http.MethodPatch, "/api/v1/admin/coupons/{id}", httpx.RouteMeta{
+		Summary: "Activate/deactivate a coupon (audited)", Tag: "admin", Auth: "admin roles",
+	}, adminFull(a.UpdateCoupon))
+
+	rg.Handle(http.MethodGet, "/api/v1/admin/audit-logs", httpx.RouteMeta{
+		Summary: "Audit log trail", Tag: "admin", Auth: "admin roles",
+	}, adminOnly(a.ListAuditLogs))
+
+	rg.Handle(http.MethodGet, "/api/v1/admin/feature-flags", httpx.RouteMeta{
+		Summary: "Feature flags", Tag: "admin", Auth: "admin roles",
+	}, adminOnly(a.FeatureFlags))
+
+	rg.Handle(http.MethodPatch, "/api/v1/admin/feature-flags/{key}", httpx.RouteMeta{
+		Summary: "Toggle a feature flag (audited)", Tag: "admin", Auth: "admin roles",
+	}, adminFull(a.UpdateFlag))
+
+	rg.Handle(http.MethodGet, "/api/v1/admin/support/tickets", httpx.RouteMeta{
+		Summary: "Support queue", Tag: "admin", Auth: "admin roles",
+	}, adminOnly(a.ListTickets))
+
+	rg.Handle(http.MethodGet, "/api/v1/admin/support/tickets/{id}", httpx.RouteMeta{
+		Summary: "Ticket thread (includes internal notes)", Tag: "admin", Auth: "admin roles",
+	}, adminOnly(a.TicketDetail))
+
+	rg.Handle(http.MethodPost, "/api/v1/admin/support/tickets/{id}/reply", httpx.RouteMeta{
+		Summary: "Reply to a ticket (internal notes supported)", Tag: "admin", Auth: "admin roles",
+	}, adminOnly(a.ReplyTicket))
+
+	rg.Handle(http.MethodPost, "/api/v1/admin/support/tickets/{id}/status", httpx.RouteMeta{
+		Summary: "Update ticket status/priority", Tag: "admin", Auth: "admin roles",
+	}, adminOnly(a.UpdateTicket))
+}
+
+func registerSupportRoutes(rg *httpx.Registry, deps Deps) {
+	s := support.NewHandlers(deps.Pool)
+	auth := deps.Auth.RequireAuth
+	ticketLimiter := deps.TicketRateLimit
+	if ticketLimiter <= 0 {
+		ticketLimiter = 10
+	}
+
+	rg.Handle(http.MethodPost, "/api/v1/support/tickets", httpx.RouteMeta{
+		Summary: "Create a support ticket (optionally order-linked)", Tag: "support", Auth: "any",
+	}, httpx.RateLimit(deps.Limit, httpx.KeyByIP, ticketLimiter, time.Minute, auth(s.CreateTicket)))
+
+	rg.Handle(http.MethodGet, "/api/v1/support/tickets", httpx.RouteMeta{
+		Summary: "Caller's own tickets", Tag: "support", Auth: "any",
+	}, auth(s.ListMine))
+
+	rg.Handle(http.MethodGet, "/api/v1/support/tickets/{id}", httpx.RouteMeta{
+		Summary: "Owner-only thread (internal notes excluded)", Tag: "support", Auth: "any",
+	}, auth(s.GetThread))
+
+	rg.Handle(http.MethodPost, "/api/v1/support/tickets/{id}/messages", httpx.RouteMeta{
+		Summary: "Reply on an owned ticket", Tag: "support", Auth: "any",
+	}, auth(s.Reply))
+}
+
+func registerNotificationRoutes(rg *httpx.Registry, deps Deps) {
+	n := notifications.NewHandlers(deps.Pool)
+	auth := deps.Auth.RequireAuth
+
+	rg.Handle(http.MethodGet, "/api/v1/notifications", httpx.RouteMeta{
+		Summary: "In-app notification centre", Tag: "notifications", Auth: "any",
+	}, auth(n.List))
+
+	rg.Handle(http.MethodPost, "/api/v1/notifications/{id}/read", httpx.RouteMeta{
+		Summary: "Mark a notification read (owner-only)", Tag: "notifications", Auth: "any",
+	}, auth(n.MarkRead))
+
+	rg.Handle(http.MethodPost, "/api/v1/notifications/read-all", httpx.RouteMeta{
+		Summary: "Mark all notifications read", Tag: "notifications", Auth: "any",
+	}, auth(n.MarkAllRead))
+
+	rg.Handle(http.MethodGet, "/api/v1/notifications/preferences", httpx.RouteMeta{
+		Summary: "Per-category delivery preferences", Tag: "notifications", Auth: "any",
+	}, auth(n.Preferences))
+
+	rg.Handle(http.MethodPatch, "/api/v1/notifications/preferences", httpx.RouteMeta{
+		Summary: "Update per-category delivery preferences", Tag: "notifications", Auth: "any",
+	}, auth(n.UpdatePreference))
 }
 
 func registerCourierRoutes(rg *httpx.Registry, deps Deps) {

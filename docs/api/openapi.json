@@ -6,6 +6,466 @@
   },
   "openapi": "3.0.3",
   "paths": {
+    "/api/v1/admin/applications": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionRole": "admin roles"
+          }
+        ],
+        "summary": "Restaurant applications",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/v1/admin/applications/{id}/review": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionRole": "admin roles"
+          }
+        ],
+        "summary": "Review an application (demo approval is a simulation)",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/v1/admin/audit-logs": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionRole": "admin roles"
+          }
+        ],
+        "summary": "Audit log trail",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/v1/admin/coupons": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionRole": "admin roles"
+          }
+        ],
+        "summary": "Coupon management list",
+        "tags": [
+          "admin"
+        ]
+      },
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionRole": "admin roles"
+          }
+        ],
+        "summary": "Create a coupon (audited)",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/v1/admin/coupons/{id}": {
+      "patch": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionRole": "admin roles"
+          }
+        ],
+        "summary": "Activate/deactivate a coupon (audited)",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/v1/admin/feature-flags": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionRole": "admin roles"
+          }
+        ],
+        "summary": "Feature flags",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/v1/admin/feature-flags/{key}": {
+      "patch": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionRole": "admin roles"
+          }
+        ],
+        "summary": "Toggle a feature flag (audited)",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/v1/admin/orders": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionRole": "admin roles"
+          }
+        ],
+        "summary": "Platform-wide order search",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/v1/admin/orders/{id}/cancel": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionRole": "admin roles"
+          }
+        ],
+        "summary": "Audited administrative cancellation (ops roles only)",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/v1/admin/overview": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionRole": "admin roles"
+          }
+        ],
+        "summary": "Platform metrics overview with documented definitions",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/v1/admin/restaurants": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionRole": "admin roles"
+          }
+        ],
+        "summary": "Organisations and outlets",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/v1/admin/riders": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionRole": "admin roles"
+          }
+        ],
+        "summary": "Delivery partners with status and load",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/v1/admin/riders/{id}/approve": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionRole": "admin roles"
+          }
+        ],
+        "summary": "Approve a rider (audited)",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/v1/admin/riders/{id}/suspend": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionRole": "admin roles"
+          }
+        ],
+        "summary": "Suspend a rider (audited)",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/v1/admin/support/tickets": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionRole": "admin roles"
+          }
+        ],
+        "summary": "Support queue",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/v1/admin/support/tickets/{id}": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionRole": "admin roles"
+          }
+        ],
+        "summary": "Ticket thread (includes internal notes)",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/v1/admin/support/tickets/{id}/reply": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionRole": "admin roles"
+          }
+        ],
+        "summary": "Reply to a ticket (internal notes supported)",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/v1/admin/support/tickets/{id}/status": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionRole": "admin roles"
+          }
+        ],
+        "summary": "Update ticket status/priority",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/v1/admin/users": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionRole": "admin roles"
+          }
+        ],
+        "summary": "User list (data-minimised)",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/v1/admin/users/{id}/activate": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionRole": "admin roles"
+          }
+        ],
+        "summary": "Reactivate a user (audited)",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/v1/admin/users/{id}/suspend": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionRole": "admin roles"
+          }
+        ],
+        "summary": "Suspend a user (audited, sessions revoked)",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
     "/api/v1/auth/login": {
       "post": {
         "responses": {
@@ -729,6 +1189,109 @@
         ]
       }
     },
+    "/api/v1/notifications": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "summary": "In-app notification centre",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/api/v1/notifications/preferences": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "summary": "Per-category delivery preferences",
+        "tags": [
+          "notifications"
+        ]
+      },
+      "patch": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "summary": "Update per-category delivery preferences",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/api/v1/notifications/read-all": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "summary": "Mark all notifications read",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/api/v1/notifications/{id}/read": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "summary": "Mark a notification read (owner-only)",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
     "/api/v1/openapi.json": {
       "get": {
         "responses": {
@@ -1130,6 +1693,88 @@
         "summary": "Full menu with categories, items and modifier groups",
         "tags": [
           "restaurants"
+        ]
+      }
+    },
+    "/api/v1/support/tickets": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "summary": "Caller's own tickets",
+        "tags": [
+          "support"
+        ]
+      },
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "summary": "Create a support ticket (optionally order-linked)",
+        "tags": [
+          "support"
+        ]
+      }
+    },
+    "/api/v1/support/tickets/{id}": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "summary": "Owner-only thread (internal notes excluded)",
+        "tags": [
+          "support"
+        ]
+      }
+    },
+    "/api/v1/support/tickets/{id}/messages": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Success (envelope)"
+          },
+          "4xx / 5xx": {
+            "description": "Error envelope { error: { code, message } }"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "summary": "Reply on an owned ticket",
+        "tags": [
+          "support"
         ]
       }
     },

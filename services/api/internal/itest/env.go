@@ -127,6 +127,7 @@ func MainStart() *Env {
 		ResetConfirmRateLimit: 1000,
 		RegisterRateLimit:     1000,
 		PlaceRateLimit:        1000,
+		TicketRateLimit:       1000,
 	}
 
 	handler, _, err := server.New(deps)

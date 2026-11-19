@@ -1,14 +1,16 @@
-export default function HomePage() {
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+
+export default function AdminHome() {
+  const router = useRouter();
+  useEffect(() => {
+    router.replace("/overview");
+  }, [router]);
   return (
-    <main className="mx-auto max-w-6xl px-4 py-10">
-      <section className="rounded-2xl bg-cream-100 px-6 py-12 text-center border border-ink-100">
-        <h1 className="text-3xl font-extrabold tracking-tight text-ink-900">
-          Platform administration shell
-        </h1>
-        <p className="mx-auto mt-3 max-w-xl text-sm text-ink-600">
-          Operational dashboards and management modules arrive with Milestone 10.
-        </p>
-      </section>
+    <main className="mx-auto max-w-md px-4 py-16 text-center">
+      <p className="text-sm text-ink-500">Loading admin console…</p>
     </main>
   );
 }

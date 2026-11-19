@@ -2,7 +2,7 @@
   "name": "biteorbit",
   "private": true,
   "version": "0.1.0",
-  "description": "BiteOrbit — multi-sided food discovery and delivery platform (local demo)",
+  "description": "BiteOrbit \u2014 multi-sided food discovery and delivery platform (local demo)",
   "packageManager": "pnpm@12.18.0",
   "scripts": {
     "dev": "node scripts/dev.mjs",
@@ -18,7 +18,7 @@
     "fmt": "prettier --write \"**/*.{ts,tsx,css,md,json,yml,yaml}\" --log-level warn",
     "fmt:check": "prettier --check \"**/*.{ts,tsx,css,md,json,yml,yaml}\"",
     "test": "pnpm test:web && pnpm test:api",
-    "test:web": "pnpm -r test",
+    "test:web": "pnpm --filter './apps/*' --filter './packages/*' test",
     "test:api": "cd services/api && go test ./...",
     "check:api": "cd services/api && go vet ./... && go fmt ./... ",
     "compose:up": "docker compose up -d",
@@ -37,14 +37,5 @@
   "engines": {
     "node": ">=20",
     "pnpm": ">=9"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild",
-      "@tailwindcss/oxide",
-      "sharp",
-      "unrs-resolver",
-      "@parcel/watcher"
-    ]
   }
 }

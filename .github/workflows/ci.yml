@@ -16,9 +16,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      # pnpm version comes from package.json "packageManager" — do not pass a
+      # separate version input (pnpm/action-setup errors on a mismatch).
       - uses: pnpm/action-setup@v4
-        with:
-          version: 12
       - uses: actions/setup-node@v4
         with:
           node-version: 24
@@ -32,7 +32,7 @@ jobs:
           NEXT_TELEMETRY_DISABLED: "1"
 
   api:
-    name: API (vet · unit · integration)
+    name: API (vet · unit · integration · openapi)
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -71,15 +71,7 @@ jobs:
         run: cd services/api && go vet ./...
       - name: Test (unit + integration, real database)
         run: cd services/api && go test ./... -count=1
-
-  openapi:
-    name: OpenAPI route coverage
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
-        with:
-          go-version: "1.27"
-          cache-dependency-path: services/api/go.sum
-      - name: Check every served route is documented
+      # The server-package TestMain boots the integration environment (real
+      # Postgres), so the OpenAPI route-coverage check runs in this job.
+      - name: OpenAPI route coverage
         run: bash scripts/openapi-check.sh
